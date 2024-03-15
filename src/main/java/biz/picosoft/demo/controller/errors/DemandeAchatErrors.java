@@ -10,5 +10,9 @@ public class DemandeAchatErrors {
     public static final String ERR_Key_wf_null = "process_id.null";
     public static final String ERR_Msg_default_state_null = "Class without default state";
     public static final String ERR_Key_default_state_null = "defaultState.null";
+    public static final String ERR_Key_not_authorized = "not_authorized";
+    public static final String ERR_Msg_not_authorized = "not authorized";
+    public static final String ERR_Key_profile_not_found = "profile_not_found";
+    public static final String ERR_Msg_profile_not_found = "profile not found";
 
 }

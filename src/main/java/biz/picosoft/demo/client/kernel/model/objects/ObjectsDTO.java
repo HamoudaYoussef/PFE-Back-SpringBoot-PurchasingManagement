@@ -2,8 +2,7 @@ package biz.picosoft.demo.client.kernel.model.objects;
 
 
 
-import biz.picosoft.anfinvoice.client.kernel.model.common.dto.AttachementDTO;
-import biz.picosoft.anfinvoice.client.kernel.model.common.dto.GetRequestFileDefinitionDTO;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,14 +14,12 @@ public class ObjectsDTO implements Serializable {
     private Long classId;
     private String simpleClassName;
     private String labelClass;
-    private List<AttachementDTO> attachements = new ArrayList<>();
     private EventsDetails events;
     private List<UserActivityDTO> userActivity = new ArrayList<>();
     private String userPermission;
     private StateObjectDto currentState;
     private String formData;
     private WFDTO workflow;
-    private List<GetRequestFileDefinitionDTO> remaingRequestFileDefinitions;
     private Security security;
     private List<Component> components;
     private String MandatoryTemplateFileName;
@@ -39,7 +36,6 @@ public class ObjectsDTO implements Serializable {
         if (objectsDTO != null) {
             this.className = objectsDTO.getClassName();
             this.classId = objectsDTO.getClassId();
-            this.attachements = objectsDTO.getAttachements();
             this.events = objectsDTO.getEvents();
             this.userActivity = objectsDTO.getUserActivity();
             this.userPermission = objectsDTO.getUserPermission();
@@ -130,13 +126,7 @@ public class ObjectsDTO implements Serializable {
         this.classId = classId;
     }
 
-    public List<AttachementDTO> getAttachements() {
-        return attachements;
-    }
 
-    public void setAttachements(List<AttachementDTO> attachements) {
-        this.attachements = attachements;
-    }
 
 
     public EventsDetails getEvents() {
@@ -179,13 +169,7 @@ public class ObjectsDTO implements Serializable {
         this.workflow = workflow;
     }
 
-    public List<GetRequestFileDefinitionDTO> getRemaingRequestFileDefinitions() {
-        return remaingRequestFileDefinitions;
-    }
 
-    public void setRemaingRequestFileDefinitions(List<GetRequestFileDefinitionDTO> remaingRequestFileDefinitions) {
-        this.remaingRequestFileDefinitions = remaingRequestFileDefinitions;
-    }
 
     public String getSimpleClassName() {
         return simpleClassName;

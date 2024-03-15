@@ -25,6 +25,9 @@ public class DemandeAchatInputDTO {
 
     private String description;
 
+    private String decision;
+
+    private String wfCurrentComment;
     public Long getId() {
         return id;
     }
@@ -66,5 +69,19 @@ public class DemandeAchatInputDTO {
         this.description = description;
     }
 
+    public String getDecision() {
+        return decision;
+    }
 
+    public void setDecision(String decision) {
+        this.decision = decision;
+    }
+
+    public String getWfCurrentComment() {
+        return wfCurrentComment;
+    }
+
+    public void setWfCurrentComment(String wfCurrentComment) {
+        this.wfCurrentComment = wfCurrentComment;
+    }
 }

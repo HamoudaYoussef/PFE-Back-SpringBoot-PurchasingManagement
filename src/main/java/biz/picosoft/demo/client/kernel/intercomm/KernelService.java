@@ -5,6 +5,8 @@ import biz.picosoft.demo.client.kernel.model.acl.AclClass;
 import biz.picosoft.demo.client.kernel.model.events.Event;
 import biz.picosoft.demo.client.kernel.model.global.*;
 import biz.picosoft.demo.client.kernel.model.objects.ObjectState;
+import biz.picosoft.demo.client.kernel.model.objects.RulesDTO;
+import biz.picosoft.demo.client.kernel.model.pm.Role;
 import biz.picosoft.demo.domain.DemandeAchat;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.persistence.Table;
 import javax.validation.constraints.Null;
@@ -34,6 +37,8 @@ import java.util.*;
 
 @Service
 public class KernelService {
+    public static final String demande_achat_role_canCreateDA = "demande_achat_canCreateDA";
+
 
     //public static final String SEQ_TENANT = "seq_tenant";
     //public static final String VAR_ROLE_ADMIN = "r";
@@ -68,6 +73,24 @@ public class KernelService {
     public ObjectState saveObjectState(ObjectState objectState) {
         return kernelInterface.saveObjectState(objectState);
     }
+    public String checkSecurity(String simpleName, Long id, List<String> sids) {
+        return kernelInterface.checkSecurity(simpleName, id, sids);
+    }
+    public String getInput(String processInstanceId, String name, String type) {
+        return kernelInterface.getInput(processInstanceId, name, type);
+    }
+
+    public RulesDTO rulesByName(String ruleName) {
+        return kernelInterface.rulesByName(ruleName);
+    }
+    public org.json.simple.JSONObject _nextTask(Map<String, Object> variables) {
+        return kernelInterface._nextTask(variables);
+    }
+    public List<Role> findAllByProfiles(@RequestParam String name) {
+        return kernelInterface.findAllByProfiles(name);
+    }
+
+
     public String Authorize(AuthUser a) {
         return kernelInterface.Authorize(a);
     }

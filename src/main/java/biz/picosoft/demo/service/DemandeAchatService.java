@@ -2,22 +2,29 @@ package biz.picosoft.demo.service;
 
 import biz.picosoft.demo.client.kernel.intercomm.KernelInterface;
 import biz.picosoft.demo.client.kernel.intercomm.KernelService;
+import biz.picosoft.demo.client.kernel.model.acl.Access;
 import biz.picosoft.demo.client.kernel.model.acl.AclClass;
+import biz.picosoft.demo.client.kernel.model.acl.Permission;
 import biz.picosoft.demo.client.kernel.model.global.CurrentUser;
-import biz.picosoft.demo.client.kernel.model.objects.ObjectState;
+import biz.picosoft.demo.client.kernel.model.objects.*;
+import biz.picosoft.demo.client.kernel.model.pm.Role;
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 import biz.picosoft.demo.controller.errors.DemandeAchatErrors;
 import biz.picosoft.demo.domain.DemandeAchat;
 import biz.picosoft.demo.domain.enumeration.StatutDA;
 import biz.picosoft.demo.repository.DemandeAchatRepository;
 import biz.picosoft.demo.service.dto.DemandeAchatDTO;
+import biz.picosoft.demo.service.dto.DemandeAchatInputDTO;
 import biz.picosoft.demo.service.dto.DemandeAchatOutputDTO;
+import biz.picosoft.demo.service.mapper.DemandeAchatInputMapper;
 import biz.picosoft.demo.service.mapper.DemandeAchatMapper;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import biz.picosoft.demo.service.mapper.DemandeAchatOutputMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +52,14 @@ public class DemandeAchatService {
 
     private final DemandeAchatOutputMapper demandeAchatOutputMapper;
 
+    private final DemandeAchatInputMapper demandeAchatInputMapper;
+
+    @Autowired
+    private  CurrentUser currentUser;
+
+
+
+
     @Autowired
     KernelService kernelService;
 
@@ -54,11 +69,147 @@ public class DemandeAchatService {
     private EntityManager entityManager;
 
 
-    public DemandeAchatService(DemandeAchatRepository demandeAchatRepository, DemandeAchatMapper demandeAchatMapper, DemandeAchatOutputMapper demandeAchatOutputMapper) {
+    public DemandeAchatService(DemandeAchatRepository demandeAchatRepository, DemandeAchatMapper demandeAchatMapper, DemandeAchatOutputMapper demandeAchatOutputMapper, DemandeAchatInputMapper demandeAchatInputMapper) {
         this.demandeAchatRepository = demandeAchatRepository;
         this.demandeAchatMapper = demandeAchatMapper;
         this.demandeAchatOutputMapper = demandeAchatOutputMapper;
+        this.demandeAchatInputMapper = demandeAchatInputMapper;
     }
+
+    public DemandeAchatOutputDTO initDemandeAchat() throws JsonProcessingException {
+
+        // check the existance of acl class
+        AclClass aclClass = kernelInterface.getaclClassByClassName(DemandeAchat.class.getName());
+        if (aclClass == null) {
+            throw new BadRequestAlertException("acl class not found", "Demande achat", null);
+        }
+
+        // check the existance of the authentifier sid
+        String employeSid=currentUser.getEmployeSid();
+        if (employeSid == null)
+            throw new BadRequestAlertException("employe sid not found", "Demande achat", null);
+
+        // check the existance of authentifier profile
+        String profile=currentUser.getProfileName();
+        if(profile==null)
+            throw new BadRequestAlertException("employe profile not found", "Demande achat", null);
+
+
+        // check can if authentifier can create Invoice
+        checkRole(currentUser.getProfileName(), kernelService.demande_achat_role_canCreateDA);
+
+        Long id = initProcess(aclClass, currentUser);
+
+        DemandeAchatOutputDTO invoiceOutputDTO = findOneById(id, aclClass);
+
+        if (invoiceOutputDTO.getWorkflow() == null)
+            throw new BadRequestAlertException(
+                    DemandeAchatErrors.ERR_Key_wf_null,
+                    DemandeAchatErrors.Entity_DemandeAchat,
+                    DemandeAchatErrors.ERR_Msg_wf_null);
+        return invoiceOutputDTO;
+    }
+    public DemandeAchatOutputDTO findOneById(Long id, AclClass aclClass) {
+        log.debug("Request to get Invoice : {}", id);
+
+        entityManager.clear();
+
+        DemandeAchatOutputDTO demandeAchatOutputDTO = new DemandeAchatOutputDTO();
+
+        Optional<DemandeAchat> o = demandeAchatRepository.findById(id);
+
+        if (!o.isPresent())
+            throw new BadRequestAlertException(
+                    DemandeAchatErrors.ERR_Key_DemandeAchat_null,
+                    DemandeAchatErrors.Entity_DemandeAchat,
+                    DemandeAchatErrors.ERR_Msg_DemandeAchAT_null);
+
+
+        ///veifier
+        ObjectDTO objectDTO = new ObjectDTO();
+        objectDTO.setObjectId(o.get().getId());
+        objectDTO.setObject(o.get());
+        objectDTO.setWfProcessId(o.get().getWfProcessID());
+        String permission = Permission.NONE.name();
+        if ((aclClass != null)) {
+            objectDTO.setClassId(aclClass.getId());
+            ObjectsDTO g = kernelInterface.getobjectsDto(objectDTO);
+            //check access after get security(list authors,readers)
+            List<String> authorsSid = new ArrayList<>();
+            List<String> readersSid = new ArrayList<>();
+            if (g.getSecurity() != null) {
+                //new ArrayList<>(sourceSet)
+                authorsSid = new ArrayList<>(g.getSecurity().getAuthors());
+                List<String> readers = new ArrayList<>(g.getSecurity().getReaders());
+                List<String> tempReaders = new ArrayList<>(g.getSecurity().getTempreaders());
+                readersSid.addAll(readers);
+                readersSid.addAll(tempReaders);
+            }
+
+
+            permission = kernelInterface.checkSecurity(aclClass.getSimpleName(), id, currentUser.getSid());
+            Access access = Access.Direct;
+            //TODO check acces security level
+//            if (permission.equals(Permission.NONE.name()))
+//                access = kernelInterface.checkAccess(authorsSid, readersSid, o.get().getSecuriteLevel());
+
+
+            if (permission.equals(Permission.NONE.name()) && access.equals(Access.NoAccess)) {
+                throw new BadRequestAlertException(
+                        DemandeAchatErrors.ERR_Msg_not_authorized,
+                        DemandeAchatErrors.Entity_DemandeAchat,
+                        DemandeAchatErrors.ERR_Key_not_authorized);
+            } else if (permission.equals(Permission.NONE.name()) && access.equals(Access.AuthorIndirect)) {
+                permission = Permission.WRITE.name();
+            } else if (permission.equals(Permission.NONE.name()) && access.equals(Access.ReaderIndirect)) {
+                permission = Permission.READ.name();
+            }
+            demandeAchatOutputDTO = demandeAchatOutputMapper.toDto(o.get());
+//            demandeAchatOutputDTO = this.setObjectINInvoiceOutputDTO(g, demandeAchatOutputDTO);
+            demandeAchatOutputDTO.setUserPermission(permission);
+            if (!permission.equals((Permission.WRITE.name()))) {
+                WFDTO wfdtoWithOutDecision = demandeAchatOutputDTO.getWorkflow();
+                if (demandeAchatOutputDTO.getWorkflow() != null) {
+                    wfdtoWithOutDecision.setDecisionsWF(new ArrayList<>());
+                    demandeAchatOutputDTO.setWorkflow(wfdtoWithOutDecision);
+                }
+            }
+
+        }
+        //set file access token
+        String datetimeExpiry = LocalDateTime.now().plusHours(1).toString();
+        String objectId = o.get().getId().toString();
+        String classId = aclClass.getId().toString();
+        String userSecurityLevel = currentUser.getProfileSecuriteLevel().toString();
+        String strToEncrypt = datetimeExpiry + "," + objectId + "," + classId + "," + userSecurityLevel + "," + permission;
+//        String fileAccesToken = kernelService.encryptFileAccessToken(strToEncrypt);
+//
+        // TODO  setFileAccessToken
+//        demandeAchatOutputDTO.setFileAccessToken(fileAccesToken);
+//
+        return demandeAchatOutputDTO;
+
+    }
+
+    public Boolean checkRole(String profile, String roleName) {
+        if (profile == null)
+            throw new BadRequestAlertException(
+                    DemandeAchatErrors.ERR_Msg_profile_not_found,
+                    DemandeAchatErrors.Entity_DemandeAchat,
+                    DemandeAchatErrors.ERR_Key_profile_not_found);
+        List<Role> roles = kernelService.findAllByProfiles(profile);
+        List<String> rolesName = new ArrayList<>();
+        for (Role role : roles)
+            rolesName.add(role.getName());
+        if (!rolesName.contains(roleName))
+            throw new BadRequestAlertException(
+                    DemandeAchatErrors.ERR_Msg_not_authorized,
+                    DemandeAchatErrors.Entity_DemandeAchat,
+                    DemandeAchatErrors.ERR_Key_not_authorized);
+        return true;
+    }
+
+
 
     public Long initProcess(AclClass aclClass, CurrentUser currentUser) {
         if (aclClass == null) {
@@ -170,6 +321,102 @@ public class DemandeAchatService {
             demandeAchat.setStatus(objectState.get().getCurrentState().getLabel());
         }
         demandeAchatRepository.save(demandeAchat);
+    }
+    public Long submitDemandeAchat(DemandeAchatInputDTO demandeAchatInputDTO, AclClass aclClass) throws Exception {
+
+        if (aclClass == null)
+            throw new BadRequestAlertException(
+                    DemandeAchatErrors.ERR_Msg_DemandeAchAT_null,
+                    DemandeAchatErrors.Entity_DemandeAchat,
+                    DemandeAchatErrors.ERR_Key_DemandeAchat_null);
+
+        String permission = kernelService.checkSecurity(aclClass.getSimpleName(), demandeAchatInputDTO.getId(), currentUser.getSid());
+        if (!permission.equals(Permission.WRITE.name()) && !permission.equals(Permission.INH_WRITE.name()))
+            throw new BadRequestAlertException(
+                    DemandeAchatErrors.ERR_Msg_not_authorized,
+                    DemandeAchatErrors.Entity_DemandeAchat,
+                    DemandeAchatErrors.ERR_Key_not_authorized);
+
+
+
+        Optional<DemandeAchat> invoiceOptional = demandeAchatRepository.findById(demandeAchatInputDTO.getId());
+        if (!invoiceOptional.isPresent()) {
+            throw new BadRequestAlertException(
+                    DemandeAchatErrors.ERR_Msg_DemandeAchAT_null,
+                    DemandeAchatErrors.Entity_DemandeAchat,
+                    DemandeAchatErrors.ERR_Key_DemandeAchat_null);
+        }
+        String activityName = invoiceOptional.get().getActivityName();
+        String wfprocessID = invoiceOptional.get().getWfProcessID();
+
+        DemandeAchat demandeAchat = null;
+        Optional<DemandeAchat> optionalInvoice=demandeAchatRepository.findById(demandeAchatInputDTO.getId());
+        if(optionalInvoice.isPresent()) {
+            demandeAchatInputMapper.partialUpdate(optionalInvoice.get(),demandeAchatInputDTO);
+            demandeAchat=optionalInvoice.get();
+        } else {
+            demandeAchat = demandeAchatInputMapper.toEntity(demandeAchatInputDTO);
+        }
+        demandeAchat.setDraft(false);
+        demandeAchat.setWfProcessID(wfprocessID);
+        demandeAchat = this.saveDA(demandeAchat, currentUser.getSid(), null, aclClass, currentUser);
+
+        // TODO tags & tpref
+//        if (invoiceInputDTO.getTags() != null)
+//            this.setCourrierTags(aclClass, courrierCreateDto.getTags(), courrier, currentUser);
+//        if (courrierCreateDto.getTpRefDtoList() != null)
+//            this.setNatureCourrier(courrierCreateDto.getTpRefDtoList(), courrier);
+
+        //set Desion, wfComment,authentifier and data(InboundByID inclus TaskByID)
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("Decision", demandeAchatInputDTO.getDecision());
+        variables.put("description", demandeAchatInputDTO.getWfCurrentComment());
+        variables.put("autentifier", currentUser.getDisplayName());
+
+        DemandeAchatOutputDTO demandeAchatOutputDTO = demandeAchatOutputMapper.toDto(demandeAchat);
+        demandeAchatOutputDTO.setClassName(aclClass.getClasse());
+        demandeAchatOutputDTO.setClassId(aclClass.getId());
+        demandeAchatOutputDTO.setLabelClass(aclClass.getLabel());
+        demandeAchatOutputDTO.setSimpleClassName(aclClass.getSimpleName());
+        WFDTO workflow = new WFDTO();
+        workflow.setWfProcessID(demandeAchat.getWfProcessID());
+        demandeAchatOutputDTO.setWorkflow(workflow);
+
+        variables.put("data", demandeAchatOutputDTO);
+
+        //execuste nextTask
+        //exexute drools preNextTask
+        //get drools by
+
+        String nameprocess = aclClass.getFwProcess();
+        String decision = demandeAchatInputDTO.getDecision();
+//        String ruleName = "name-rule-bpm-" + nameprocess + "-" + activityName + "-" + decision;
+//        System.out.println("ruleName//" + ruleName);
+//        ruleName = ruleName.replaceAll(" ", "");
+        //get name rule
+//        try {
+//            Object nameRuleInput = kernelService.getInput(demandeAchat.getWfProcessID(), ruleName, "string");
+//            String nameRule;
+//            if (nameRuleInput == null) {
+//                nameRule = "bpm-" + nameprocess + "-" + activityName + "-" + decision;
+//                nameRule = nameRule.replaceAll(" ", "");
+//                kernelService.rulesByName(nameRule);
+//
+//            } else {
+//                nameRule = (String) nameRuleInput;
+//                RulesDTO rulesDTO = kernelService.rulesByName(nameRule);
+//                if (rulesDTO != null && rulesDTO.getSrcCode() != null) {
+//                    List<Object> objectList = new ArrayList<>();
+//                    objectList.add(demandeAchatInputDTO);
+//                }
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+
+        kernelService._nextTask(variables);
+
+        return demandeAchat.getId();
     }
 
     /**

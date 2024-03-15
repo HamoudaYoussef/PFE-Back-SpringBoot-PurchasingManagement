@@ -1,5 +1,9 @@
 package biz.picosoft.demo.controller;
 
+import biz.picosoft.demo.client.kernel.intercomm.KernelInterface;
+import biz.picosoft.demo.client.kernel.intercomm.KernelService;
+import biz.picosoft.demo.client.kernel.model.acl.AclClass;
+import biz.picosoft.demo.domain.DemandeAchat;
 import biz.picosoft.demo.repository.DemandeAchatRepository;
 import biz.picosoft.demo.service.DemandeAchatQueryService;
 import biz.picosoft.demo.service.DemandeAchatService;
@@ -12,9 +16,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import biz.picosoft.demo.service.dto.DemandeAchatInputDTO;
+import biz.picosoft.demo.service.dto.DemandeAchatOutputDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +31,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
+
+import javax.validation.Valid;
 
 /**
  * REST controller for managing {@link biz.picosoft.demo.domain.DemandeAchat}.
@@ -45,14 +54,21 @@ public class DemandeAchatResource {
 
     private final DemandeAchatQueryService demandeAchatQueryService;
 
+    private final KernelInterface kernelInterface;
+
+    private final KernelService kernelService;
     public DemandeAchatResource(
         DemandeAchatService demandeAchatService,
         DemandeAchatRepository demandeAchatRepository,
-        DemandeAchatQueryService demandeAchatQueryService
-    ) {
+        DemandeAchatQueryService demandeAchatQueryService,
+        KernelService kernelService,
+        KernelInterface kernelInterface)
+    {
         this.demandeAchatService = demandeAchatService;
         this.demandeAchatRepository = demandeAchatRepository;
         this.demandeAchatQueryService = demandeAchatQueryService;
+        this.kernelService = kernelService;
+        this.kernelInterface = kernelInterface;
     }
 
     /**
@@ -203,5 +219,43 @@ public class DemandeAchatResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * {@code PATCH  /initInvoice} : Create a new invoice.
+     *
+     * @return the {@link ResponseEntity< DemandeAchatOutputDTO >} with status {@code 201 (Created)} and with body the new invoice recement initiated, or with status {@code 400 (Bad Request)} if the dossier has already an ID.
+     * @throws JsonProcessingException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping("/initInvoice")
+    public ResponseEntity<DemandeAchatOutputDTO> initInvoice() throws JsonProcessingException {
+        log.debug("REST request to init invoice : {}");
+
+        DemandeAchatOutputDTO result = demandeAchatService.initDemandeAchat();
+
+        return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                .body(result);
+    }
+
+    /**
+     * {@code PATCH  /submitInvoice} : submit invoice.
+     *
+     * @return the {@link ResponseEntity<DemandeAchatOutputDTO>}  with status {@code 201 (Created)} and with body the identified invoice recement initiated, or with status {@code 400 (Bad Request)} if the invoice no already has an ID.
+     */
+    @PatchMapping("/submitInvoice")
+    public ResponseEntity<DemandeAchatOutputDTO> submitInvoice(@Valid @RequestBody DemandeAchatInputDTO demandeAchatInputDTO) throws Exception {
+        log.debug("REST request to submit invoice: " + demandeAchatInputDTO.toString());
+
+        AclClass aclClass = kernelInterface.getaclClassByClassName(DemandeAchat.class.getName());
+
+        Long id = demandeAchatService.submitDemandeAchat(demandeAchatInputDTO, aclClass);
+
+        DemandeAchatOutputDTO result=demandeAchatService.findOneById(id, aclClass);
+
+        return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                .body(result);
+
     }
 }

@@ -4,9 +4,9 @@ import biz.picosoft.demo.client.config.FeignConfig;
 import biz.picosoft.demo.client.kernel.model.acl.AclClass;
 import biz.picosoft.demo.client.kernel.model.events.Event;
 import biz.picosoft.demo.client.kernel.model.global.*;
-import biz.picosoft.demo.client.kernel.model.objects.ObjectState;
-import biz.picosoft.demo.client.kernel.model.objects.StateMetric;
+import biz.picosoft.demo.client.kernel.model.objects.*;
 import biz.picosoft.demo.client.kernel.model.pm.ActivityType;
+import biz.picosoft.demo.client.kernel.model.pm.Role;
 import biz.picosoft.demo.client.kernel.model.pm.UserActivity;
 import org.json.JSONObject;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -46,6 +46,21 @@ public interface KernelInterface {
     Optional<ObjectState> getObjectState(@RequestParam String businessClass, @RequestParam Long objectId);
     @RequestMapping(method = RequestMethod.POST, value = "/save-objectState")
     ObjectState saveObjectState(@RequestBody ObjectState objectState);
+    @RequestMapping(method = RequestMethod.GET, value = "/checkSecurity")
+    String checkSecurity(@RequestParam("simpleName") String simpleName, @RequestParam("id") Long id, @RequestParam("sids") List<String> sids);
+    @RequestMapping(method = RequestMethod.GET, value = "/getInput")
+    String getInput(@RequestParam("processInstanceId")String processInstanceId, @RequestParam("name")String name,@RequestParam("type")String type);
+
+    @GetMapping(value = "/rulesByName")
+    RulesDTO rulesByName(@RequestParam String ruleName);
+    @RequestMapping(method = RequestMethod.POST, value = "/workflow/_nextTask")
+    org.json.simple.JSONObject _nextTask(@RequestBody Map<String, Object> variables);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/roles_name")
+    List<Role> findAllByProfiles(@RequestParam String name);
+    @RequestMapping(method = RequestMethod.POST, value = "/objects")
+    ObjectsDTO getobjectsDto(@RequestBody ObjectDTO objectDTO);
+
     @RequestMapping(method = RequestMethod.GET, value = "/getToken")
     String getToken(@RequestParam("apiKey") String apiKey);
 
