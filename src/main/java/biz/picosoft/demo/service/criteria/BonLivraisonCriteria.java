@@ -8,9 +8,7 @@ import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * Criteria class for the {@link biz.picosoft.demo.domain.BonLivraison} entity. This class is used
- * in {@link biz.picosoft.demo.web.rest.BonLivraisonResource} to receive all the possible filtering options from
- * the Http GET request parameters.
+
  * For example the following could be a valid request:
  * {@code /bon-livraisons?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
  * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
@@ -24,12 +22,11 @@ public class BonLivraisonCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
-
     private LongFilter numerobonlivraison;
 
     private LocalDateFilter datelivraion;
 
-    private LongFilter factureId;
+    private LongFilter boncommandeId;
 
     private Boolean distinct;
 
@@ -39,7 +36,7 @@ public class BonLivraisonCriteria implements Serializable, Criteria {
         this.id = other.id == null ? null : other.id.copy();
         this.numerobonlivraison = other.numerobonlivraison == null ? null : other.numerobonlivraison.copy();
         this.datelivraion = other.datelivraion == null ? null : other.datelivraion.copy();
-        this.factureId = other.factureId == null ? null : other.factureId.copy();
+        this.boncommandeId = other.boncommandeId == null ? null : other.boncommandeId.copy();
         this.distinct = other.distinct;
     }
 
@@ -62,8 +59,6 @@ public class BonLivraisonCriteria implements Serializable, Criteria {
     public void setId(LongFilter id) {
         this.id = id;
     }
-
-
 
     public LongFilter getNumerobonlivraison() {
         return numerobonlivraison;
@@ -95,19 +90,19 @@ public class BonLivraisonCriteria implements Serializable, Criteria {
         this.datelivraion = datelivraion;
     }
 
-    public LongFilter getFactureId() {
-        return factureId;
+    public LongFilter getBoncommandeId() {
+        return boncommandeId;
     }
 
-    public LongFilter factureId() {
-        if (factureId == null) {
-            factureId = new LongFilter();
+    public LongFilter boncommandeId() {
+        if (boncommandeId == null) {
+            boncommandeId = new LongFilter();
         }
-        return factureId;
+        return boncommandeId;
     }
 
-    public void setFactureId(LongFilter factureId) {
-        this.factureId = factureId;
+    public void setBoncommandeId(LongFilter boncommandeId) {
+        this.boncommandeId = boncommandeId;
     }
 
     public Boolean getDistinct() {
@@ -131,14 +126,14 @@ public class BonLivraisonCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(numerobonlivraison, that.numerobonlivraison) &&
             Objects.equals(datelivraion, that.datelivraion) &&
-            Objects.equals(factureId, that.factureId) &&
+            Objects.equals(boncommandeId, that.boncommandeId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, numerobonlivraison, datelivraion, factureId, distinct);
+        return Objects.hash(id, numerobonlivraison, datelivraion, boncommandeId, distinct);
     }
 
     // prettier-ignore
@@ -148,7 +143,7 @@ public class BonLivraisonCriteria implements Serializable, Criteria {
             (id != null ? "id=" + id + ", " : "") +
             (numerobonlivraison != null ? "numerobonlivraison=" + numerobonlivraison + ", " : "") +
             (datelivraion != null ? "datelivraion=" + datelivraion + ", " : "") +
-            (factureId != null ? "factureId=" + factureId + ", " : "") +
+            (boncommandeId != null ? "boncommandeId=" + boncommandeId + ", " : "") +
             (distinct != null ? "distinct=" + distinct + ", " : "") +
             "}";
     }

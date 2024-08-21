@@ -4,28 +4,55 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
 
-/**
- * A DTO for the {@link biz.picosoft.demo.domain.Offre} entity.
- */
+
 @Schema(description = "not an ignored comment")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class OffreDTO implements Serializable {
 
     private Long id;
+    private String nom;
 
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
 
     private Float prix;
 
     private LocalDate dateoffre;
 
     private String description;
+    private String referenceoffre;
 
-    private FournisseurDTO fournisseur;
+    public String getReferenceoffre() {
+        return referenceoffre;
+    }
+
+    public void setReferenceoffre(String referenceoffre) {
+        this.referenceoffre = referenceoffre;
+    }
 
     private DemandeAchatDTO demandeachat;
 
-    private ProduitDTO produit;
+    private FournisseurDTO fournisseur;
+
+    public Set<ProduitOffertDTO> getProduitOfferts() {
+        return produitOfferts;
+    }
+
+    public void setProduitOfferts(Set<ProduitOffertDTO> produitOfferts) {
+        this.produitOfferts = produitOfferts;
+    }
+
+    private Set<ProduitOffertDTO> produitOfferts;
+
+
+
 
     public Long getId() {
         return id;
@@ -34,7 +61,6 @@ public class OffreDTO implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
 
     public Float getPrix() {
         return prix;
@@ -60,14 +86,6 @@ public class OffreDTO implements Serializable {
         this.description = description;
     }
 
-    public FournisseurDTO getFournisseur() {
-        return fournisseur;
-    }
-
-    public void setFournisseur(FournisseurDTO fournisseur) {
-        this.fournisseur = fournisseur;
-    }
-
     public DemandeAchatDTO getDemandeachat() {
         return demandeachat;
     }
@@ -76,12 +94,12 @@ public class OffreDTO implements Serializable {
         this.demandeachat = demandeachat;
     }
 
-    public ProduitDTO getProduit() {
-        return produit;
+    public FournisseurDTO getFournisseur() {
+        return fournisseur;
     }
 
-    public void setProduit(ProduitDTO produit) {
-        this.produit = produit;
+    public void setFournisseur(FournisseurDTO fournisseur) {
+        this.fournisseur = fournisseur;
     }
 
     @Override
@@ -113,9 +131,8 @@ public class OffreDTO implements Serializable {
             ", prix=" + getPrix() +
             ", dateoffre='" + getDateoffre() + "'" +
             ", description='" + getDescription() + "'" +
-            ", fournisseur=" + getFournisseur() +
             ", demandeachat=" + getDemandeachat() +
-            ", produit=" + getProduit() +
+            ", fournisseur=" + getFournisseur() +
             "}";
     }
 }

@@ -1,5 +1,6 @@
 package biz.picosoft.demo.controller;
 
+import biz.picosoft.demo.domain.Produit;
 import biz.picosoft.demo.repository.ProduitRepository;
 import biz.picosoft.demo.service.ProduitQueryService;
 import biz.picosoft.demo.service.ProduitService;
@@ -13,9 +14,11 @@ import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +47,8 @@ public class ProduitResource {
 
     private final ProduitQueryService produitQueryService;
 
-    public ProduitResource(ProduitService produitService, ProduitRepository produitRepository, ProduitQueryService produitQueryService) {
+    public ProduitResource(ProduitService produitService, ProduitRepository produitRepository,
+     ProduitQueryService produitQueryService) {
         this.produitService = produitService;
         this.produitRepository = produitRepository;
         this.produitQueryService = produitQueryService;
@@ -144,19 +148,24 @@ public class ProduitResource {
      * {@code GET  /produits} : get all the produits.
      *
      * @param pageable the pagination information.
-     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of produits in body.
      */
-    @GetMapping("/produit")
-    public ResponseEntity<List<ProduitDTO>> getAllProduits(
-        ProduitCriteria criteria,
-        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    @GetMapping("/getProduits")
+    public ResponseEntity<Page<Produit>> getAllProduits(
+            @PageableDefault(size = 20) Pageable pageable
     ) {
-        log.debug("REST request to get Produits by criteria: {}", criteria);
+        log.debug("REST request to get Produits by page");
 
-        Page<ProduitDTO> page = produitQueryService.findByCriteria(criteria, pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        Page<Produit> pageProduits = produitRepository.findAll(pageable);
+
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), pageProduits);
+        return ResponseEntity.ok().headers(headers).body(pageProduits);
+    }
+
+
+    @GetMapping("/produits")
+    public List<ProduitDTO> getAllProduitsSimple() {
+        return produitService.findAllSimple();
     }
 
     /**
@@ -199,4 +208,16 @@ public class ProduitResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
+
+   /* @GetMapping("/demande-achat/{demandeAchatId}")
+    public List<Produit> getProduitsByDemandeAchatId(@PathVariable Long demandeAchatId) {
+        return produitService.getProduitsByDemandeAchatId(demandeAchatId);
+    }
+*/
+    @GetMapping("/verifier/{id}")
+    public String verifierStock(@PathVariable Long id) {
+        return produitService.verifierStock(id);
+    }
+
 }
+

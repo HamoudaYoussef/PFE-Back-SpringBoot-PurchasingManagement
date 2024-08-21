@@ -2,13 +2,12 @@ package biz.picosoft.demo.service.criteria;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import org.springdoc.api.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * the Http GET request parameters.
+
  * For example the following could be a valid request:
  * {@code /demande-devis?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
  * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
@@ -24,9 +23,29 @@ public class DemandeDevisCriteria implements Serializable, Criteria {
 
     private StringFilter description;
 
-    private LongFilter produitsId;
+    private LongFilter quantite;
 
-    private LongFilter demandesachatId;
+    private StringFilter nom;
+
+    public StringFilter getNom() {
+        return nom;
+    }
+
+    public void setNom(StringFilter nom) {
+        this.nom = nom;
+    }
+
+    private LongFilter fournisseurId;
+
+    public LongFilter getDemandeAchatId() {
+        return demandeAchatId;
+    }
+
+    public void setDemandeAchatId(LongFilter demandeAchatId) {
+        this.demandeAchatId = demandeAchatId;
+    }
+
+    private LongFilter demandeAchatId;
 
     private Boolean distinct;
 
@@ -35,8 +54,10 @@ public class DemandeDevisCriteria implements Serializable, Criteria {
     public DemandeDevisCriteria(DemandeDevisCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
         this.description = other.description == null ? null : other.description.copy();
-        this.produitsId = other.produitsId == null ? null : other.produitsId.copy();
-        this.demandesachatId = other.demandesachatId == null ? null : other.demandesachatId.copy();
+        this.quantite = other.quantite == null ? null : other.quantite.copy();
+        this.nom = other.nom == null ? null : other.nom.copy();
+        this.demandeAchatId = other.demandeAchatId == null ? null : other.demandeAchatId.copy();
+        this.fournisseurId = other.fournisseurId == null ? null : other.fournisseurId.copy();
         this.distinct = other.distinct;
     }
 
@@ -75,34 +96,38 @@ public class DemandeDevisCriteria implements Serializable, Criteria {
         this.description = description;
     }
 
-    public LongFilter getProduitsId() {
-        return produitsId;
+    public LongFilter getQuantite() {
+        return quantite;
     }
 
-    public LongFilter produitsId() {
-        if (produitsId == null) {
-            produitsId = new LongFilter();
+    public LongFilter quantite() {
+        if (quantite == null) {
+            quantite = new LongFilter();
         }
-        return produitsId;
+        return quantite;
     }
 
-    public void setProduitsId(LongFilter produitsId) {
-        this.produitsId = produitsId;
+    public void setQuantite(LongFilter quantite) {
+        this.quantite = quantite;
     }
 
-    public LongFilter getDemandesachatId() {
-        return demandesachatId;
+
+
+
+
+    public LongFilter getFournisseurId() {
+        return fournisseurId;
     }
 
-    public LongFilter demandesachatId() {
-        if (demandesachatId == null) {
-            demandesachatId = new LongFilter();
+    public LongFilter fournisseurId() {
+        if (fournisseurId == null) {
+            fournisseurId = new LongFilter();
         }
-        return demandesachatId;
+        return fournisseurId;
     }
 
-    public void setDemandesachatId(LongFilter demandesachatId) {
-        this.demandesachatId = demandesachatId;
+    public void setFournisseurId(LongFilter fournisseurId) {
+        this.fournisseurId = fournisseurId;
     }
 
     public Boolean getDistinct() {
@@ -125,15 +150,17 @@ public class DemandeDevisCriteria implements Serializable, Criteria {
         return (
             Objects.equals(id, that.id) &&
             Objects.equals(description, that.description) &&
-            Objects.equals(produitsId, that.produitsId) &&
-            Objects.equals(demandesachatId, that.demandesachatId) &&
+            Objects.equals(quantite, that.quantite) &&
+            Objects.equals(nom, that.nom) &&
+            Objects.equals(demandeAchatId, that.demandeAchatId) &&
+            Objects.equals(fournisseurId, that.fournisseurId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, description, produitsId, demandesachatId, distinct);
+        return Objects.hash(id, description, quantite, nom, demandeAchatId, fournisseurId, distinct);
     }
 
     // prettier-ignore
@@ -142,8 +169,10 @@ public class DemandeDevisCriteria implements Serializable, Criteria {
         return "DemandeDevisCriteria{" +
             (id != null ? "id=" + id + ", " : "") +
             (description != null ? "description=" + description + ", " : "") +
-            (produitsId != null ? "produitsId=" + produitsId + ", " : "") +
-            (demandesachatId != null ? "demandesachatId=" + demandesachatId + ", " : "") +
+            (quantite != null ? "quantite=" + quantite + ", " : "") +
+            (nom != null ? "nom=" + nom + ", " : "") +
+            (demandeAchatId != null ? "demandeAchatId=" + demandeAchatId + ", " : "") +
+            (fournisseurId != null ? "fournisseurId=" + fournisseurId + ", " : "") +
             (distinct != null ? "distinct=" + distinct + ", " : "") +
             "}";
     }

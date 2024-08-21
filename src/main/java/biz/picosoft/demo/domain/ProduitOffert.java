@@ -2,39 +2,84 @@ package biz.picosoft.demo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
-import java.io.Serializable;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A ProduitOffert.
  */
 @Entity
-//@Table(name = "produit_offert", schema = "achat")
-@Table(name = "produit_offert")
-
+@Table(name = "produit_offert", schema = "achat")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
-
 public class ProduitOffert implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "quantiteofferte")
-    private Long quantiteofferte;
+    @Column(name = "nom")
+    private String nom;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "quantite")
+    private Long quantite;
+
+    public Long getPrix() {
+        return prix;
+    }
+
+    public void setPrix(Long prix) {
+        this.prix = prix;
+    }
+
+    @Column(name = "prix")
+    private Long prix;
+
+
+    public Fournisseur getFournisseur() {
+        return fournisseur;
+    }
+
+    public void setFournisseur(Fournisseur fournisseur) {
+        this.fournisseur = fournisseur;
+    }
+
+    public Offre getOffre() {
+        return offre;
+    }
+
+    public void setOffre(Offre offre) {
+        this.offre = offre;
+    }
+
+  /*  @OneToMany(fetch = FetchType.LAZY, mappedBy = "produitOffert")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "produits", "demandeDevis", "offre", "produitOffert" }, allowSetters = true)
+    private Set<Fournisseur>fournisseurs ;*/
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "boncommandes", "fournisseur", "demandeachat", "produit" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "produits", "demandeDevis", "offre", "produitOffert" }, allowSetters = true)
+    private Fournisseur fournisseur ;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "fournisseurs", "demandeAchats", "bonCommande", "produitOffert" }, allowSetters = true)
     private Offre offre;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "offres" }, allowSetters = true)
-    private Produit produit;
+  /*  @OneToMany(fetch = FetchType.LAZY, mappedBy = "produitOffert")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "fournisseurs", "demandeAchats", "bonCommande", "produitOffert" }, allowSetters = true)
+    private Set<Offre> offres = new HashSet<>();*/
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -51,44 +96,43 @@ public class ProduitOffert implements Serializable {
         this.id = id;
     }
 
-
-    public Long getQuantiteofferte() {
-        return this.quantiteofferte;
+    public String getNom() {
+        return this.nom;
     }
 
-    public ProduitOffert quantiteofferte(Long quantiteofferte) {
-        this.setQuantiteofferte(quantiteofferte);
+    public ProduitOffert nom(String nom) {
+        this.setNom(nom);
         return this;
     }
 
-    public void setQuantiteofferte(Long quantiteofferte) {
-        this.quantiteofferte = quantiteofferte;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
-    public Offre getOffre() {
-        return this.offre;
+    public String getDescription() {
+        return this.description;
     }
 
-    public void setOffre(Offre offre) {
-        this.offre = offre;
-    }
-
-    public ProduitOffert offre(Offre offre) {
-        this.setOffre(offre);
+    public ProduitOffert description(String description) {
+        this.setDescription(description);
         return this;
     }
 
-    public Produit getProduit() {
-        return this.produit;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public void setProduit(Produit produit) {
-        this.produit = produit;
+    public Long getQuantite() {
+        return this.quantite;
     }
 
-    public ProduitOffert produit(Produit produit) {
-        this.setProduit(produit);
+    public ProduitOffert quantite(Long quantite) {
+        this.setQuantite(quantite);
         return this;
+    }
+
+    public void setQuantite(Long quantite) {
+        this.quantite = quantite;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -115,7 +159,9 @@ public class ProduitOffert implements Serializable {
     public String toString() {
         return "ProduitOffert{" +
             "id=" + getId() +
-            ", quantiteofferte=" + getQuantiteofferte() +
+            ", nom='" + getNom() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", quantite=" + getQuantite() +
             "}";
     }
 }

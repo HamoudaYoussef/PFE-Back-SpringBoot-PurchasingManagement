@@ -1,16 +1,15 @@
 package biz.picosoft.demo.controller;
 
-import biz.picosoft.demo.repository.ProduitOffertRepository;
-import biz.picosoft.demo.service.ProduitOffertQueryService;
-import biz.picosoft.demo.service.ProduitOffertService;
-import biz.picosoft.demo.service.criteria.ProduitOffertCriteria;
-import biz.picosoft.demo.service.dto.ProduitOffertDTO;
-import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import biz.picosoft.demo.controller.errors.BadRequestAlertException;
+import biz.picosoft.demo.repository.ProduitOffertRepository;
+import biz.picosoft.demo.service.ProduitOffertService;
+import biz.picosoft.demo.service.dto.ProduitOffertDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +24,6 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link biz.picosoft.demo.domain.ProduitOffert}.
  */
 @RestController
 @RequestMapping("/api/produit-offerts")
@@ -33,25 +31,18 @@ public class ProduitOffertResource {
 
     private final Logger log = LoggerFactory.getLogger(ProduitOffertResource.class);
 
-    private static final String ENTITY_NAME = "gestionAchatPfeProduitOffert";
+    private static final String ENTITY_NAME = "produitOffert";
 
-  //  @Value("${jhipster.clientApp.name}")
+   // @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final ProduitOffertService produitOffertService;
 
     private final ProduitOffertRepository produitOffertRepository;
 
-    private final ProduitOffertQueryService produitOffertQueryService;
-
-    public ProduitOffertResource(
-        ProduitOffertService produitOffertService,
-        ProduitOffertRepository produitOffertRepository,
-        ProduitOffertQueryService produitOffertQueryService
-    ) {
+    public ProduitOffertResource(ProduitOffertService produitOffertService, ProduitOffertRepository produitOffertRepository) {
         this.produitOffertService = produitOffertService;
         this.produitOffertRepository = produitOffertRepository;
-        this.produitOffertQueryService = produitOffertQueryService;
     }
 
     /**
@@ -148,31 +139,14 @@ public class ProduitOffertResource {
      * {@code GET  /produit-offerts} : get all the produitOfferts.
      *
      * @param pageable the pagination information.
-     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of produitOfferts in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<ProduitOffertDTO>> getAllProduitOfferts(
-        ProduitOffertCriteria criteria,
-        @org.springdoc.api.annotations.ParameterObject Pageable pageable
-    ) {
-        log.debug("REST request to get ProduitOfferts by criteria: {}", criteria);
-
-        Page<ProduitOffertDTO> page = produitOffertQueryService.findByCriteria(criteria, pageable);
+    public ResponseEntity<List<ProduitOffertDTO>> getAllProduitOfferts(Pageable pageable) {
+        log.debug("REST request to get a page of ProduitOfferts");
+        Page<ProduitOffertDTO> page = produitOffertService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
-    }
-
-    /**
-     * {@code GET  /produit-offerts/count} : count all the produitOfferts.
-     *
-     * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
-     */
-    @GetMapping("/count")
-    public ResponseEntity<Long> countProduitOfferts(ProduitOffertCriteria criteria) {
-        log.debug("REST request to count ProduitOfferts by criteria: {}", criteria);
-        return ResponseEntity.ok().body(produitOffertQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -202,5 +176,11 @@ public class ProduitOffertResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/by-offre/{offreId}")
+    public ResponseEntity<List<ProduitOffertDTO>> getProduitOffertsByOffreId(@PathVariable Long offreId) {
+        List<ProduitOffertDTO> produitOfferts = produitOffertService.findByOffreId(offreId);
+        return ResponseEntity.ok().body(produitOfferts);
     }
 }

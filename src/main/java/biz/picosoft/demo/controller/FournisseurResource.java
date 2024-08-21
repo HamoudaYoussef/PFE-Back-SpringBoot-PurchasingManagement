@@ -1,5 +1,6 @@
 package biz.picosoft.demo.controller;
 
+import biz.picosoft.demo.domain.Produit;
 import biz.picosoft.demo.repository.FournisseurRepository;
 import biz.picosoft.demo.service.FournisseurQueryService;
 import biz.picosoft.demo.service.FournisseurService;
@@ -86,13 +87,15 @@ public class FournisseurResource {
      */
     @PutMapping("/update/{id}")
     public ResponseEntity<FournisseurDTO> updateFournisseur(
-        @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody FournisseurDTO fournisseurDTO
+            @PathVariable("id") final Long id,
+            @RequestBody FournisseurDTO fournisseurDTO
     ) throws URISyntaxException {
         log.debug("REST request to update Fournisseur : {}, {}", id, fournisseurDTO);
+
         if (fournisseurDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idnull");
         }
+
         if (!Objects.equals(id, fournisseurDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
@@ -103,10 +106,11 @@ public class FournisseurResource {
 
         FournisseurDTO result = fournisseurService.update(fournisseurDTO);
         return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, fournisseurDTO.getId().toString()))
-            .body(result);
+                .ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, fournisseurDTO.getId().toString()))
+                .body(result);
     }
+
 
     /**
      * {@code PATCH  /fournisseurs/:id} : Partial updates given fields of an existing fournisseur, field will ignore if it is null
@@ -202,5 +206,10 @@ public class FournisseurResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/fournisseurs/produit/{id}")
+    public List<Produit> getProduitsByFournisseur(@PathVariable Long id) {
+        return fournisseurService.getProduitsByFournisseur(id);
     }
 }

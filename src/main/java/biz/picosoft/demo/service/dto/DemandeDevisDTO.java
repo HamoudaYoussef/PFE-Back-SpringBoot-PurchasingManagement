@@ -1,17 +1,50 @@
-package com.mycompany.demo.service.dto;
+package biz.picosoft.demo.service.dto;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
 
-/**
- * A DTO for the {@link com.mycompany.demo.domain.DemandeDevis} entity.
- */
+
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class DemandeDevisDTO implements Serializable {
 
     private Long id;
 
     private String description;
+
+    private Long quantite;
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    private String nom;
+
+    public Long getFournisseurId() {
+        return fournisseurId;
+    }
+
+    public void setFournisseurId(Long fournisseurId) {
+        this.fournisseurId = fournisseurId;
+    }
+
+    public Long getDemandeAchatId() {
+        return demandeAchatId;
+    }
+
+    public void setDemandeAchatId(Long demandeAchatId) {
+        this.demandeAchatId = demandeAchatId;
+    }
+
+    private Long fournisseurId;
+
+    private Long demandeAchatId;
+
 
     public Long getId() {
         return id;
@@ -28,6 +61,17 @@ public class DemandeDevisDTO implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public Long getQuantite() {
+        return quantite;
+    }
+
+    public void setQuantite(Long quantite) {
+        this.quantite = quantite;
+    }
+
+
+
 
     @Override
     public boolean equals(Object o) {
@@ -56,6 +100,7 @@ public class DemandeDevisDTO implements Serializable {
         return "DemandeDevisDTO{" +
             "id=" + getId() +
             ", description='" + getDescription() + "'" +
+            ", quantite=" + getQuantite() +
             "}";
     }
 }

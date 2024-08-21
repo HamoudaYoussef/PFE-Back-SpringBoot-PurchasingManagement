@@ -3,6 +3,8 @@ package biz.picosoft.demo.client.kernel.model.objects;
 
 
 
+import biz.picosoft.demo.client.kernel.model.common.dto.AttachementDTO;
+import biz.picosoft.demo.client.kernel.model.common.dto.GetRequestFileDefinitionDTO;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,24 +12,35 @@ import java.util.List;
 
 public class ObjectsDTO implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private String className;
     private Long classId;
     private String simpleClassName;
     private String labelClass;
+    private List<AttachementDTO> attachements = new ArrayList<>();
     private EventsDetails events;
     private List<UserActivityDTO> userActivity = new ArrayList<>();
     private String userPermission;
     private StateObjectDto currentState;
-    private String formData;
+    private String formSource;
     private WFDTO workflow;
+    private List<GetRequestFileDefinitionDTO> remaingRequestFileDefinitions;
     private Security security;
     private List<Component> components;
+
     private String MandatoryTemplateFileName;
     private String OptionalTemplateFileName;
     private String officeTemplateFileName;
     private String emailTemplateFileName;
     private List<String>  DefaultTemplateFileName;
+    private String readFormNameFM; //
+    private String editFormNameFM; //
 
+    private String readFormName;
+    private String editFormName;
+
+    private String wfProcessName;
 
 
     public ObjectsDTO() {
@@ -36,15 +49,49 @@ public class ObjectsDTO implements Serializable {
         if (objectsDTO != null) {
             this.className = objectsDTO.getClassName();
             this.classId = objectsDTO.getClassId();
+            this.attachements = objectsDTO.getAttachements();
             this.events = objectsDTO.getEvents();
             this.userActivity = objectsDTO.getUserActivity();
             this.userPermission = objectsDTO.getUserPermission();
             this.currentState = objectsDTO.getCurrentState();
             this.workflow = objectsDTO.getWorkflow();
-            this.formData = objectsDTO.getFormData();
+            this.wfProcessName = objectsDTO.getWfProcessName();
+            this.formSource = objectsDTO.getFormSource();
             this.security=objectsDTO.getSecurity();
             this.components=objectsDTO.getComponents();
         }
+    }
+
+    public String getReadFormNameFM() {
+        return readFormNameFM;
+    }
+
+    public void setReadFormNameFM(String readFormNameFM) {
+        this.readFormNameFM = readFormNameFM;
+    }
+
+    public String getEditFormNameFM() {
+        return editFormNameFM;
+    }
+
+    public void setEditFormNameFM(String editFormNameFM) {
+        this.editFormNameFM = editFormNameFM;
+    }
+
+    public String getReadFormName() {
+        return readFormName;
+    }
+
+    public void setReadFormName(String readFormName) {
+        this.readFormName = readFormName;
+    }
+
+    public String getEditFormName() {
+        return editFormName;
+    }
+
+    public void setEditFormName(String editFormName) {
+        this.editFormName = editFormName;
     }
 
     public String getMandatoryTemplateFileName() {
@@ -102,12 +149,12 @@ public class ObjectsDTO implements Serializable {
         this.security = security;
     }
 
-    public String getFormData() {
-        return formData;
+    public String getFormSource() {
+        return formSource;
     }
 
-    public void setFormData(String formData) {
-        this.formData = formData;
+    public void setFormSource(String formSource) {
+        this.formSource = formSource;
     }
 
     public String getClassName() {
@@ -126,7 +173,13 @@ public class ObjectsDTO implements Serializable {
         this.classId = classId;
     }
 
+    public List<AttachementDTO> getAttachements() {
+        return attachements;
+    }
 
+    public void setAttachements(List<AttachementDTO> attachements) {
+        this.attachements = attachements;
+    }
 
 
     public EventsDetails getEvents() {
@@ -169,7 +222,13 @@ public class ObjectsDTO implements Serializable {
         this.workflow = workflow;
     }
 
+    public List<GetRequestFileDefinitionDTO> getRemaingRequestFileDefinitions() {
+        return remaingRequestFileDefinitions;
+    }
 
+    public void setRemaingRequestFileDefinitions(List<GetRequestFileDefinitionDTO> remaingRequestFileDefinitions) {
+        this.remaingRequestFileDefinitions = remaingRequestFileDefinitions;
+    }
 
     public String getSimpleClassName() {
         return simpleClassName;
@@ -185,5 +244,13 @@ public class ObjectsDTO implements Serializable {
 
     public void setLabelClass(String labelClass) {
         this.labelClass = labelClass;
+    }
+
+    public String getWfProcessName() {
+        return wfProcessName;
+    }
+
+    public void setWfProcessName(String wfProcessName) {
+        this.wfProcessName = wfProcessName;
     }
 }

@@ -1,12 +1,14 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.domain.*; // for static metamodels
+import biz.picosoft.demo.domain.BonCommande_;
 import biz.picosoft.demo.domain.Facture;
+import biz.picosoft.demo.domain.Facture_;
+import biz.picosoft.demo.domain.Paiement_;
 import biz.picosoft.demo.repository.FactureRepository;
 import biz.picosoft.demo.service.criteria.FactureCriteria;
 import biz.picosoft.demo.service.dto.FactureDTO;
 import biz.picosoft.demo.service.mapper.FactureMapper;
-import javax.persistence.criteria.JoinType;
+
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
+
+import javax.persistence.criteria.JoinType;
 
 /**
  * Service for executing complex queries for {@link Facture} entities in the database.
@@ -90,7 +94,6 @@ public class FactureQueryService extends QueryService<Facture> {
             if (criteria.getId() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getId(), Facture_.id));
             }
-
             if (criteria.getDatefacture() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getDatefacture(), Facture_.datefacture));
             }
@@ -139,30 +142,18 @@ public class FactureQueryService extends QueryService<Facture> {
             if (criteria.getReference() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getReference(), Facture_.reference));
             }
-            if (criteria.getPaiementsId() != null) {
+            if (criteria.getPaiementId() != null) {
                 specification =
                     specification.and(
-                        buildSpecification(
-                            criteria.getPaiementsId(),
-                            root -> root.join(Facture_.paiements, JoinType.LEFT).get(Paiement_.id)
-                        )
+                        buildSpecification(criteria.getPaiementId(), root -> root.join(Facture_.paiements, JoinType.LEFT).get(Paiement_.id))
                     );
             }
-            if (criteria.getBonlivraisonsId() != null) {
+            if (criteria.getBonCommandeId() != null) {
                 specification =
                     specification.and(
                         buildSpecification(
-                            criteria.getBonlivraisonsId(),
-                            root -> root.join(Facture_.bonlivraisons, JoinType.LEFT).get(BonLivraison_.id)
-                        )
-                    );
-            }
-            if (criteria.getBonCcmmandeId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(
-                            criteria.getBonCcmmandeId(),
-                            root -> root.join(Facture_.bonCcmmande, JoinType.LEFT).get(BonCommande_.id)
+                            criteria.getBonCommandeId(),
+                            root -> root.join(Facture_.bonCommande, JoinType.LEFT).get(BonCommande_.id)
                         )
                     );
             }

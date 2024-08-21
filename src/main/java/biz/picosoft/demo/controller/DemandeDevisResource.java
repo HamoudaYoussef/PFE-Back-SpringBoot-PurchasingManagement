@@ -1,17 +1,20 @@
 package biz.picosoft.demo.controller;
 
+import biz.picosoft.demo.domain.DemandeDevis;
+import biz.picosoft.demo.domain.Offre;
 import biz.picosoft.demo.repository.DemandeDevisRepository;
 import biz.picosoft.demo.service.DemandeDevisQueryService;
 import biz.picosoft.demo.service.DemandeDevisService;
 import biz.picosoft.demo.service.criteria.DemandeDevisCriteria;
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 
-import com.mycompany.demo.service.dto.DemandeDevisDTO;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import biz.picosoft.demo.service.dto.DemandeDevisDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -202,5 +205,16 @@ public class DemandeDevisResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+    @PostMapping("/batch")
+    public ResponseEntity<List<DemandeDevisDTO>> saveAllDemandeDevis(@RequestBody List<DemandeDevisDTO> demandeDevisDTOList) {
+        List<DemandeDevisDTO> result = demandeDevisService.saveAll(demandeDevisDTOList);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping("/{id}/fournisseur-name")
+    public String getFournisseurName(@PathVariable Long id) {
+        DemandeDevis demandeDevis = demandeDevisRepository.findById(id).orElseThrow();
+        return demandeDevis.getFournisseur().getNom();
     }
 }

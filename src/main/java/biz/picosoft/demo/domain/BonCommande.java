@@ -1,22 +1,24 @@
 package biz.picosoft.demo.domain;
 
+import biz.picosoft.demo.domain.ennumeration.InfoPaiement;
+import biz.picosoft.demo.domain.ennumeration.StatutBonCommande;
+import biz.picosoft.demo.domain.ennumeration.TypeLivraison;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.envers.Audited;
 
 /**
  * Task entity.
  * @author The JHipster team.
  */
 @Entity
-//@Table(name = "bon_commande", schema = "achat")
-@Table(name = "bon_commande")
+@Table(name = "bon_commande", schema = "achat")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class BonCommande implements Serializable {
@@ -24,40 +26,251 @@ public class BonCommande implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
     private Long id;
-
-
 
     @Column(name = "dateboncommande")
     private LocalDate dateboncommande;
 
     @Column(name = "reference")
     private String reference;
+    @Column(name = "nomentreprise")
+    private String nomentreprise;
+    @Column(name = "adresseentreprise")
+    private String adresseentreprise;
+    @Column(name = "statutbc")
+    @Enumerated(EnumType.STRING)
+    private StatutBonCommande statutbc;
 
-    @Column(name = "quantite")
-    private Long quantite;
+    public StatutBonCommande getStatutbc() {
+        return statutbc;
+    }
 
-    @Column(name = "prixunitaire")
-    private Long prixunitaire;
+    public void setStatutbc(StatutBonCommande statutbc) {
+        this.statutbc = statutbc;
+    }
 
-    @Column(name = "totalht")
-    private Long totalht;
+    @Column(name = "delailivraison")
+    private LocalDate delailivraison;
+    @Column(name = "typelivraison")
+    @Enumerated(EnumType.STRING)
+    private TypeLivraison typelivraison;
 
-    @Column(name = "tva")
-    private Long tva;
+    @Column(name = "fraislivraison")
+    private Long fraislivraison;
 
-    @Column(name = "totalttc")
-    private Long totalttc;
+    @Column(name = "taxes")
+    private Long taxes;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "bonCcmmande")
+    @Column(name = "montanttotal")
+    private Long montanttotal;
+
+    @Column(name = "signature")
+    private String signature;
+
+    @Size(min = 0, max = 50)
+    @Column(name = "identifiant", length = 50, nullable = true)
+    private String identifiant;
+    @Column(name = "activity_name")
+    private String activityName;
+    @Column(name = "demande_number")
+    private String demandeNumber;
+    @Column(name = "number_of_attachments")
+    private Long numberOfattachments = 0L;
+    @Column(name = "exclude_from_view")
+    private Boolean excludeFromView = true;
+
+    @Column(name = "infopaiement")
+    @Enumerated(EnumType.STRING)
+    private InfoPaiement infopaiement;
+
+
+    public Boolean getExcludeFromView() {
+        return excludeFromView;
+    }
+    public Boolean isExcludeFromView() {
+        return excludeFromView;
+    }
+
+    public void setExcludeFromView(Boolean excludeFromView) {
+        this.excludeFromView = excludeFromView;
+    }
+
+    @Column(name = "status")
+    private String status;
+
+    public String getWfProcessID() {
+        return wfProcessID;
+    }
+
+    public void setWfProcessID(String wfProcessID) {
+        this.wfProcessID = wfProcessID;
+    }
+
+    public String getActivityName() {
+        return activityName;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
+    }
+
+    public @Size(min = 0, max = 50) String getIdentifiant() {
+        return identifiant;
+    }
+
+    public void setIdentifiant(@Size(min = 0, max = 50) String identifiant) {
+        this.identifiant = identifiant;
+    }
+
+    public String getDemandeNumber() {
+        return demandeNumber;
+    }
+
+    public void setDemandeNumber(String demandeNumber) {
+        this.demandeNumber = demandeNumber;
+    }
+
+    public Long getNumberOfattachments() {
+        return numberOfattachments;
+    }
+
+    public void setNumberOfattachments(Long numberOfattachments) {
+        this.numberOfattachments = numberOfattachments;
+    }
+
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    public Boolean getEndProcess() {
+        return endProcess;
+    }
+
+    public void setEndProcess(Boolean endProcess) {
+        this.endProcess = endProcess;
+    }
+
+    public Integer getSecuriteLevel() {
+        return securiteLevel;
+    }
+
+    public void setSecuriteLevel(Integer securiteLevel) {
+        this.securiteLevel = securiteLevel;
+    }
+
+    @Column(name = "wf_process_id")
+    private String wfProcessID;
+
+    @Column(name = "securite_level")
+    private Integer securiteLevel;
+    @Column(name = "assignee")
+    private String assignee;
+
+    public String getNomentreprise() {
+        return nomentreprise;
+    }
+
+    public void setNomentreprise(String nomentreprise) {
+        this.nomentreprise = nomentreprise;
+    }
+
+    public String getAdresseentreprise() {
+        return adresseentreprise;
+    }
+
+    public void setAdresseentreprise(String adresseentreprise) {
+        this.adresseentreprise = adresseentreprise;
+    }
+
+    public LocalDate getDelailivraison() {
+        return delailivraison;
+    }
+
+    public void setDelailivraison(LocalDate delailivraison) {
+        this.delailivraison = delailivraison;
+    }
+
+    public TypeLivraison getTypelivraison() {
+        return typelivraison;
+    }
+
+    public void setTypelivraison(TypeLivraison typelivraison) {
+        this.typelivraison = typelivraison;
+    }
+
+    public Long getFraislivraison() {
+        return fraislivraison;
+    }
+
+    public void setFraislivraison(Long fraislivraison) {
+        this.fraislivraison = fraislivraison;
+    }
+
+    public Long getTaxes() {
+        return taxes;
+    }
+
+    public void setTaxes(Long taxes) {
+        this.taxes = taxes;
+    }
+
+    public Long getMontanttotal() {
+        return montanttotal;
+    }
+
+    public void setMontanttotal(Long montanttotal) {
+        this.montanttotal = montanttotal;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public InfoPaiement getInfopaiement() {
+        return infopaiement;
+    }
+
+    public void setInfopaiement(InfoPaiement infopaiement) {
+        this.infopaiement = infopaiement;
+    }
+
+    @Column(name = "end_process")
+    private Boolean endProcess;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "boncommande")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "paiements", "bonlivraisons", "bonCcmmande" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "boncommande" }, allowSetters = true)
+    private Set<BonLivraison> bonlivraisons = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "bonCommande")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "paiements", "bonCommande" }, allowSetters = true)
     private Set<Facture> factures = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "boncommandes", "fournisseur", "demandeachat", "produit" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "boncommandes", "demandeachat", "fournisseur" }, allowSetters = true)
     private Offre offre;
+
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -73,8 +286,6 @@ public class BonCommande implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
     public LocalDate getDateboncommande() {
         return this.dateboncommande;
@@ -102,69 +313,35 @@ public class BonCommande implements Serializable {
         this.reference = reference;
     }
 
-    public Long getQuantite() {
-        return this.quantite;
+    public Set<BonLivraison> getBonlivraisons() {
+        return this.bonlivraisons;
     }
 
-    public BonCommande quantite(Long quantite) {
-        this.setQuantite(quantite);
+    public void setBonlivraisons(Set<BonLivraison> bonLivraisons) {
+        if (this.bonlivraisons != null) {
+            this.bonlivraisons.forEach(i -> i.setBoncommande(null));
+        }
+        if (bonLivraisons != null) {
+            bonLivraisons.forEach(i -> i.setBoncommande(this));
+        }
+        this.bonlivraisons = bonLivraisons;
+    }
+
+    public BonCommande bonlivraisons(Set<BonLivraison> bonLivraisons) {
+        this.setBonlivraisons(bonLivraisons);
         return this;
     }
 
-    public void setQuantite(Long quantite) {
-        this.quantite = quantite;
-    }
-
-    public Long getPrixunitaire() {
-        return this.prixunitaire;
-    }
-
-    public BonCommande prixunitaire(Long prixunitaire) {
-        this.setPrixunitaire(prixunitaire);
+    public BonCommande addBonlivraison(BonLivraison bonLivraison) {
+        this.bonlivraisons.add(bonLivraison);
+        bonLivraison.setBoncommande(this);
         return this;
     }
 
-    public void setPrixunitaire(Long prixunitaire) {
-        this.prixunitaire = prixunitaire;
-    }
-
-    public Long getTotalht() {
-        return this.totalht;
-    }
-
-    public BonCommande totalht(Long totalht) {
-        this.setTotalht(totalht);
+    public BonCommande removeBonlivraison(BonLivraison bonLivraison) {
+        this.bonlivraisons.remove(bonLivraison);
+        bonLivraison.setBoncommande(null);
         return this;
-    }
-
-    public void setTotalht(Long totalht) {
-        this.totalht = totalht;
-    }
-
-    public Long getTva() {
-        return this.tva;
-    }
-
-    public BonCommande tva(Long tva) {
-        this.setTva(tva);
-        return this;
-    }
-
-    public void setTva(Long tva) {
-        this.tva = tva;
-    }
-
-    public Long getTotalttc() {
-        return this.totalttc;
-    }
-
-    public BonCommande totalttc(Long totalttc) {
-        this.setTotalttc(totalttc);
-        return this;
-    }
-
-    public void setTotalttc(Long totalttc) {
-        this.totalttc = totalttc;
     }
 
     public Set<Facture> getFactures() {
@@ -173,10 +350,10 @@ public class BonCommande implements Serializable {
 
     public void setFactures(Set<Facture> factures) {
         if (this.factures != null) {
-            this.factures.forEach(i -> i.setBonCcmmande(null));
+            this.factures.forEach(i -> i.setBonCommande(null));
         }
         if (factures != null) {
-            factures.forEach(i -> i.setBonCcmmande(this));
+            factures.forEach(i -> i.setBonCommande(this));
         }
         this.factures = factures;
     }
@@ -186,15 +363,15 @@ public class BonCommande implements Serializable {
         return this;
     }
 
-    public BonCommande addFactures(Facture facture) {
+    public BonCommande addFacture(Facture facture) {
         this.factures.add(facture);
-        facture.setBonCcmmande(this);
+        facture.setBonCommande(this);
         return this;
     }
 
-    public BonCommande removeFactures(Facture facture) {
+    public BonCommande removeFacture(Facture facture) {
         this.factures.remove(facture);
-        facture.setBonCcmmande(null);
+        facture.setBonCommande(null);
         return this;
     }
 
@@ -210,6 +387,7 @@ public class BonCommande implements Serializable {
         this.setOffre(offre);
         return this;
     }
+
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
@@ -237,11 +415,6 @@ public class BonCommande implements Serializable {
             "id=" + getId() +
             ", dateboncommande='" + getDateboncommande() + "'" +
             ", reference='" + getReference() + "'" +
-            ", quantite=" + getQuantite() +
-            ", prixunitaire=" + getPrixunitaire() +
-            ", totalht=" + getTotalht() +
-            ", tva=" + getTva() +
-            ", totalttc=" + getTotalttc() +
             "}";
     }
 }

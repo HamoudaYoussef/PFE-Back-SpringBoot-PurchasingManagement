@@ -1,12 +1,12 @@
 package biz.picosoft.demo.repository;
 
-import biz.picosoft.demo.domain.Facture;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
+
+import biz.picosoft.demo.domain.Facture;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 

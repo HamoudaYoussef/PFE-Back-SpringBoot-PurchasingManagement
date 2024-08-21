@@ -1,12 +1,13 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.domain.*; // for static metamodels
+import biz.picosoft.demo.domain.DemandeAchat_;
+import biz.picosoft.demo.domain.Fournisseur_;
 import biz.picosoft.demo.domain.Produit;
+import biz.picosoft.demo.domain.Produit_;
 import biz.picosoft.demo.repository.ProduitRepository;
 import biz.picosoft.demo.service.criteria.ProduitCriteria;
 import biz.picosoft.demo.service.dto.ProduitDTO;
 import biz.picosoft.demo.service.mapper.ProduitMapper;
-import javax.persistence.criteria.JoinType;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
+
+import javax.persistence.criteria.JoinType;
 
 /**
  * Service for executing complex queries for {@link Produit} entities in the database.
@@ -83,16 +86,8 @@ public class ProduitQueryService extends QueryService<Produit> {
     protected Specification<Produit> createSpecification(ProduitCriteria criteria) {
         Specification<Produit> specification = Specification.where(null);
         if (criteria != null) {
-            // This has to be called first, because the distinct method returns null
-            if (criteria.getDistinct() != null) {
-                specification = specification.and(distinct(criteria.getDistinct()));
-            }
             if (criteria.getId() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getId(), Produit_.id));
-            }
-
-            if (criteria.getDateachat() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getDateachat(), Produit_.dateachat));
             }
             if (criteria.getDescription() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getDescription(), Produit_.description));
@@ -100,43 +95,20 @@ public class ProduitQueryService extends QueryService<Produit> {
             if (criteria.getNom() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getNom(), Produit_.nom));
             }
-            if (criteria.getPoids() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getPoids(), Produit_.poids));
+            if (criteria.getQuantite() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getQuantite(), Produit_.quantite));
             }
-            if (criteria.getForme() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getForme(), Produit_.forme));
+            if (criteria.getQuantite() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getQuantite(), Produit_.quantite));
             }
-            if (criteria.getTaille() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getTaille(), Produit_.taille));
+            if (criteria.getQuantitedemandeur() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getQuantitedemandeur(), Produit_.quantitedemandeur));
             }
             if (criteria.getCouleur() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getCouleur(), Produit_.couleur));
             }
-            if (criteria.getUntietaille() != null) {
-                specification = specification.and(buildSpecification(criteria.getUntietaille(), Produit_.untietaille));
-            }
-            if (criteria.getUnitepoids() != null) {
-                specification = specification.and(buildSpecification(criteria.getUnitepoids(), Produit_.unitepoids));
-            }
-            if (criteria.getVolume() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getVolume(), Produit_.volume));
-            }
-            if (criteria.getUnitevolume() != null) {
-                specification = specification.and(buildSpecification(criteria.getUnitevolume(), Produit_.unitevolume));
-            }
-            if (criteria.getSurface() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getSurface(), Produit_.surface));
-            }
-            if (criteria.getUnitesurface() != null) {
-                specification = specification.and(buildSpecification(criteria.getUnitesurface(), Produit_.unitesurface));
-            }
-            if (criteria.getOffresId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(criteria.getOffresId(), root -> root.join(Produit_.offres, JoinType.LEFT).get(Offre_.id))
-                    );
-            }
         }
+
         return specification;
     }
 }

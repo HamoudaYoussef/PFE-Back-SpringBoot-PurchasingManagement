@@ -2,15 +2,12 @@ package biz.picosoft.demo.service.criteria;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import org.springdoc.api.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * Criteria class for the {@link biz.picosoft.demo.domain.Offre} entity. This class is used
- * in {@link biz.picosoft.demo.web.rest.OffreResource} to receive all the possible filtering options from
- * the Http GET request parameters.
+
  * For example the following could be a valid request:
  * {@code /offres?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
  * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
@@ -24,20 +21,40 @@ public class OffreCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
+    public StringFilter getNom() {
+        return nom;
+    }
+
+    public void setNom(StringFilter nom) {
+        this.nom = nom;
+    }
+
+    private StringFilter nom;
+
 
     private FloatFilter prix;
 
     private LocalDateFilter dateoffre;
 
+
     private StringFilter description;
 
-    private LongFilter boncommandesId;
+    public StringFilter getReferenceoffre() {
+        return referenceoffre;
+    }
 
-    private LongFilter fournisseurId;
+    public void setReferenceoffre(StringFilter referenceoffre) {
+        this.referenceoffre = referenceoffre;
+    }
+
+    private StringFilter referenceoffre;
+
+
+    private LongFilter boncommandeId;
 
     private LongFilter demandeachatId;
 
-    private LongFilter produitId;
+    private LongFilter fournisseurId;
 
     private Boolean distinct;
 
@@ -45,13 +62,14 @@ public class OffreCriteria implements Serializable, Criteria {
 
     public OffreCriteria(OffreCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
+        this.nom = other.nom == null ? null : other.nom.copy();
         this.prix = other.prix == null ? null : other.prix.copy();
         this.dateoffre = other.dateoffre == null ? null : other.dateoffre.copy();
         this.description = other.description == null ? null : other.description.copy();
-        this.boncommandesId = other.boncommandesId == null ? null : other.boncommandesId.copy();
-        this.fournisseurId = other.fournisseurId == null ? null : other.fournisseurId.copy();
+        this.referenceoffre = other.referenceoffre == null ? null : other.referenceoffre.copy();
+        this.boncommandeId = other.boncommandeId == null ? null : other.boncommandeId.copy();
         this.demandeachatId = other.demandeachatId == null ? null : other.demandeachatId.copy();
-        this.produitId = other.produitId == null ? null : other.produitId.copy();
+        this.fournisseurId = other.fournisseurId == null ? null : other.fournisseurId.copy();
         this.distinct = other.distinct;
     }
 
@@ -74,8 +92,6 @@ public class OffreCriteria implements Serializable, Criteria {
     public void setId(LongFilter id) {
         this.id = id;
     }
-
-
 
     public FloatFilter getPrix() {
         return prix;
@@ -122,34 +138,19 @@ public class OffreCriteria implements Serializable, Criteria {
         this.description = description;
     }
 
-    public LongFilter getBoncommandesId() {
-        return boncommandesId;
+    public LongFilter getBoncommandeId() {
+        return boncommandeId;
     }
 
-    public LongFilter boncommandesId() {
-        if (boncommandesId == null) {
-            boncommandesId = new LongFilter();
+    public LongFilter boncommandeId() {
+        if (boncommandeId == null) {
+            boncommandeId = new LongFilter();
         }
-        return boncommandesId;
+        return boncommandeId;
     }
 
-    public void setBoncommandesId(LongFilter boncommandesId) {
-        this.boncommandesId = boncommandesId;
-    }
-
-    public LongFilter getFournisseurId() {
-        return fournisseurId;
-    }
-
-    public LongFilter fournisseurId() {
-        if (fournisseurId == null) {
-            fournisseurId = new LongFilter();
-        }
-        return fournisseurId;
-    }
-
-    public void setFournisseurId(LongFilter fournisseurId) {
-        this.fournisseurId = fournisseurId;
+    public void setBoncommandeId(LongFilter boncommandeId) {
+        this.boncommandeId = boncommandeId;
     }
 
     public LongFilter getDemandeachatId() {
@@ -167,19 +168,19 @@ public class OffreCriteria implements Serializable, Criteria {
         this.demandeachatId = demandeachatId;
     }
 
-    public LongFilter getProduitId() {
-        return produitId;
+    public LongFilter getFournisseurId() {
+        return fournisseurId;
     }
 
-    public LongFilter produitId() {
-        if (produitId == null) {
-            produitId = new LongFilter();
+    public LongFilter fournisseurId() {
+        if (fournisseurId == null) {
+            fournisseurId = new LongFilter();
         }
-        return produitId;
+        return fournisseurId;
     }
 
-    public void setProduitId(LongFilter produitId) {
-        this.produitId = produitId;
+    public void setFournisseurId(LongFilter fournisseurId) {
+        this.fournisseurId = fournisseurId;
     }
 
     public Boolean getDistinct() {
@@ -201,20 +202,21 @@ public class OffreCriteria implements Serializable, Criteria {
         final OffreCriteria that = (OffreCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(prix, that.prix) &&
+                    Objects.equals(nom, that.nom) &&
+                    Objects.equals(prix, that.prix) &&
             Objects.equals(dateoffre, that.dateoffre) &&
             Objects.equals(description, that.description) &&
-            Objects.equals(boncommandesId, that.boncommandesId) &&
-            Objects.equals(fournisseurId, that.fournisseurId) &&
+                    Objects.equals(referenceoffre, that.referenceoffre) &&
+                    Objects.equals(boncommandeId, that.boncommandeId) &&
             Objects.equals(demandeachatId, that.demandeachatId) &&
-            Objects.equals(produitId, that.produitId) &&
+            Objects.equals(fournisseurId, that.fournisseurId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, prix, dateoffre, description, boncommandesId, fournisseurId, demandeachatId, produitId, distinct);
+        return Objects.hash(id, prix, dateoffre, description, boncommandeId, demandeachatId, fournisseurId, distinct);
     }
 
     // prettier-ignore
@@ -225,10 +227,9 @@ public class OffreCriteria implements Serializable, Criteria {
             (prix != null ? "prix=" + prix + ", " : "") +
             (dateoffre != null ? "dateoffre=" + dateoffre + ", " : "") +
             (description != null ? "description=" + description + ", " : "") +
-            (boncommandesId != null ? "boncommandesId=" + boncommandesId + ", " : "") +
-            (fournisseurId != null ? "fournisseurId=" + fournisseurId + ", " : "") +
+            (boncommandeId != null ? "boncommandeId=" + boncommandeId + ", " : "") +
             (demandeachatId != null ? "demandeachatId=" + demandeachatId + ", " : "") +
-            (produitId != null ? "produitId=" + produitId + ", " : "") +
+            (fournisseurId != null ? "fournisseurId=" + fournisseurId + ", " : "") +
             (distinct != null ? "distinct=" + distinct + ", " : "") +
             "}";
     }

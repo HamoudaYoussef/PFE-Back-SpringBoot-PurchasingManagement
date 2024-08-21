@@ -4,14 +4,11 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-/**
- * A DTO for the {@link biz.picosoft.demo.domain.Paiement} entity.
- */
+
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class PaiementDTO implements Serializable {
 
     private Long id;
-
 
     private Long montanttotal;
 
@@ -30,8 +27,6 @@ public class PaiementDTO implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
     public Long getMontanttotal() {
         return montanttotal;

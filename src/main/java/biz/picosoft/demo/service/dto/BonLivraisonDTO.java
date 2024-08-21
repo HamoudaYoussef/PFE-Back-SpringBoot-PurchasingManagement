@@ -4,18 +4,17 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-/**
- * A DTO for the {@link biz.picosoft.demo.domain.BonLivraison} entity.
- */
+
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class BonLivraisonDTO implements Serializable {
 
     private Long id;
 
-
     private Long numerobonlivraison;
 
     private LocalDate datelivraion;
+
+    private BonCommandeDTO boncommande;
 
     public Long getId() {
         return id;
@@ -24,8 +23,6 @@ public class BonLivraisonDTO implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
     public Long getNumerobonlivraison() {
         return numerobonlivraison;
@@ -41,6 +38,14 @@ public class BonLivraisonDTO implements Serializable {
 
     public void setDatelivraion(LocalDate datelivraion) {
         this.datelivraion = datelivraion;
+    }
+
+    public BonCommandeDTO getBoncommande() {
+        return boncommande;
+    }
+
+    public void setBoncommande(BonCommandeDTO boncommande) {
+        this.boncommande = boncommande;
     }
 
     @Override
@@ -71,6 +76,7 @@ public class BonLivraisonDTO implements Serializable {
             "id=" + getId() +
             ", numerobonlivraison=" + getNumerobonlivraison() +
             ", datelivraion='" + getDatelivraion() + "'" +
+            ", boncommande=" + getBoncommande() +
             "}";
     }
 }

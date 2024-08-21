@@ -14,7 +14,6 @@ public class AclClass extends Auditable {
     private String simpleName;
 
     private String label;
-    private StateWorkflow defaultState;
 
     private String tableName;
 
@@ -43,6 +42,7 @@ public class AclClass extends Auditable {
     private String other;
 
     private Integer securiteLevel = 0;
+    private StateWorkflow defaultState;
 
 
     public Long getId() {
@@ -75,13 +75,6 @@ public class AclClass extends Auditable {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-    public StateWorkflow getDefaultState() {
-        return defaultState;
-    }
-
-    public void setDefaultState(StateWorkflow defaultState) {
-        this.defaultState = defaultState;
     }
 
     public String getTableName() {
@@ -195,5 +188,14 @@ public class AclClass extends Auditable {
     public void setSecuriteLevel(Integer securiteLevel) {
         this.securiteLevel = securiteLevel;
     }
+
+    public StateWorkflow getDefaultState() {
+        return defaultState;
+    }
+
+    public void setDefaultState(StateWorkflow defaultState) {
+        this.defaultState = defaultState;
+    }
+
 }
 

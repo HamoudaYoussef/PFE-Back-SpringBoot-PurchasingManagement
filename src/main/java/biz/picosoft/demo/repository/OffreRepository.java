@@ -1,8 +1,9 @@
 package biz.picosoft.demo.repository;
 
-import biz.picosoft.demo.domain.Offre;
 import java.util.List;
 import java.util.Optional;
+
+import biz.picosoft.demo.domain.Offre;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -34,4 +35,17 @@ public interface OffreRepository extends JpaRepository<Offre, Long>, JpaSpecific
 
     @Query("select offre from Offre offre left join fetch offre.fournisseur where offre.id =:id")
     Optional<Offre> findOneWithToOneRelationships(@Param("id") Long id);
+
+    @Query("SELECT o FROM Offre o ORDER BY o.dateoffre DESC")
+    List<Offre> findRecentOffres();
+    @Query("SELECT o FROM Offre o WHERE o.fournisseur.id = :fournisseurId ")
+    List<Offre> findOffresByFournisseur(@Param("fournisseurId") Long fournisseurId);
+    @Query("SELECT o FROM Offre o WHERE o.demandeachat.id = :demandeachatId ")
+    List<Offre> findOffresByDemandeAchat(@Param("demandeachatId") Long demandeachatId);
+
+    @Query("DELETE FROM Offre o WHERE o.demandeachat.id = :demandeachatId")
+    void deleteByDemandeachatId(@Param("demandeachatId") Long demandeachatId);
+
+    @Query("SELECT COUNT(o) FROM Offre o WHERE MONTH(o.dateoffre) =?1")
+    Long countByDateCreationMois(int mois);
 }

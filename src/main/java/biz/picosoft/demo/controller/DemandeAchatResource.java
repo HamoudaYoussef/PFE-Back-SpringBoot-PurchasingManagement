@@ -3,7 +3,9 @@ package biz.picosoft.demo.controller;
 import biz.picosoft.demo.client.kernel.intercomm.KernelInterface;
 import biz.picosoft.demo.client.kernel.intercomm.KernelService;
 import biz.picosoft.demo.client.kernel.model.acl.AclClass;
+import biz.picosoft.demo.client.kernel.model.global.CurrentUser;
 import biz.picosoft.demo.domain.DemandeAchat;
+import biz.picosoft.demo.domain.ennumeration.StatutDA;
 import biz.picosoft.demo.repository.DemandeAchatRepository;
 import biz.picosoft.demo.service.DemandeAchatQueryService;
 import biz.picosoft.demo.service.DemandeAchatService;
@@ -11,6 +13,7 @@ import biz.picosoft.demo.service.criteria.DemandeAchatCriteria;
 import biz.picosoft.demo.service.dto.DemandeAchatDTO;
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -19,7 +22,9 @@ import java.util.Optional;
 
 import biz.picosoft.demo.service.dto.DemandeAchatInputDTO;
 import biz.picosoft.demo.service.dto.DemandeAchatOutputDTO;
+import biz.picosoft.demo.service.dto.PaiementDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -31,8 +36,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
-
-import javax.validation.Valid;
 
 /**
  * REST controller for managing {@link biz.picosoft.demo.domain.DemandeAchat}.
@@ -56,19 +59,25 @@ public class DemandeAchatResource {
 
     private final KernelInterface kernelInterface;
 
+    private final CurrentUser currentUser;
+
+
     private final KernelService kernelService;
     public DemandeAchatResource(
         DemandeAchatService demandeAchatService,
         DemandeAchatRepository demandeAchatRepository,
         DemandeAchatQueryService demandeAchatQueryService,
         KernelService kernelService,
-        KernelInterface kernelInterface)
+        KernelInterface kernelInterface,
+        CurrentUser currentUser)
     {
         this.demandeAchatService = demandeAchatService;
         this.demandeAchatRepository = demandeAchatRepository;
         this.demandeAchatQueryService = demandeAchatQueryService;
         this.kernelService = kernelService;
         this.kernelInterface = kernelInterface;
+        this.currentUser = currentUser;
+
     }
 
     /**
@@ -107,23 +116,26 @@ public class DemandeAchatResource {
         @RequestBody DemandeAchatDTO demandeAchatDTO
     ) throws URISyntaxException {
         log.debug("REST request to update DemandeAchat : {}, {}", id, demandeAchatDTO);
-        if (demandeAchatDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, demandeAchatDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
+
+
 
         if (!demandeAchatRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
-
+        demandeAchatDTO.setId(id);
         DemandeAchatDTO result = demandeAchatService.update(demandeAchatDTO);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, demandeAchatDTO.getId().toString()))
             .body(result);
     }
+
+   @PutMapping("/{id}/changer-statut")
+    public ResponseEntity<String> changerStatut(@PathVariable long id,StatutDA statutDA) {
+        demandeAchatService.updateStatut(id, statutDA.termine);
+        return ResponseEntity.ok("Statut mis à jour avec succès !");
+    }
+
 
     /**
      * {@code PATCH  /demande-achats//:id} : Partial updates given fields of an existing demandeAchat, field will ignore if it is null
@@ -164,22 +176,22 @@ public class DemandeAchatResource {
     /**
      * {@code GET  /demande-achats} : get all the demandeAchats.
      *
-     * @param pageable the pagination information.
      * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of demandeAchats in body.
      */
     @GetMapping("/getDA")
-    public ResponseEntity<List<DemandeAchatDTO>> getAllDemandeAchats(
-        DemandeAchatCriteria criteria,
-        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    public ResponseEntity<Page<DemandeAchatDTO>> getAllDemandeAchats(
+            DemandeAchatCriteria criteria,
+            @org.springdoc.api.annotations.ParameterObject Pageable pageable
+
     ) {
-        log.debug("REST request to get DemandeAchats by criteria: {}", criteria);
-
+        log.debug("REST request to get all DemandeAchats by criteria: {}", criteria);
         Page<DemandeAchatDTO> page = demandeAchatQueryService.findByCriteria(criteria, pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
-    }
 
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page);
+
+    }
     /**
      * {@code GET  /demande-achats/count} : count all the demandeAchats.
      *
@@ -205,6 +217,10 @@ public class DemandeAchatResource {
         return ResponseUtil.wrapOrNotFound(demandeAchatDTO);
     }
 
+    @GetMapping("/demandes/termine")
+    public List<DemandeAchat> getDemandesTerminees() {
+        return demandeAchatService.getDemandeByStatutTermine();
+    }
     /**
      * {@code DELETE  /demande-achats/:id} : delete the "id" demandeAchat.
      *
@@ -227,35 +243,59 @@ public class DemandeAchatResource {
      * @return the {@link ResponseEntity< DemandeAchatOutputDTO >} with status {@code 201 (Created)} and with body the new invoice recement initiated, or with status {@code 400 (Bad Request)} if the dossier has already an ID.
      * @throws JsonProcessingException if the Location URI syntax is incorrect.
      */
-    @PatchMapping("/initInvoice")
-    public ResponseEntity<DemandeAchatOutputDTO> initInvoice() throws JsonProcessingException {
-        log.debug("REST request to init invoice : {}");
+    @PatchMapping("/initDA")
+    public DemandeAchatOutputDTO initDemande() throws Exception {
 
-        DemandeAchatOutputDTO result = demandeAchatService.initDemandeAchat();
+        // check if the conneceted person have role can create inbound
+        demandeAchatService.checkRole(currentUser.getProfileName(), kernelService.demande_achat_canCreateDA );
 
-        return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-                .body(result);
+        // extract acl class
+        AclClass aclClass = kernelInterface.getaclClassByClassName(DemandeAchat.class.getName());
+
+        return demandeAchatService.initProcessDemandeAchat(aclClass);
+
     }
+
+    @GetMapping("/demandeAchatDTO/{id}")
+    DemandeAchatOutputDTO getDemandeDTO(@PathVariable Long id) throws IOException, TemplateException {
+        return demandeAchatService.getDADTObyId(id);
+    }
+//    @GetMapping("/demandeAchatValidDTO/{id}")
+//    DemandeAchatOutputDTO getDemandeAchatValidDTO(@PathVariable Long id) throws IOException, TemplateException {
+//        return demandeAchatService.getDADTObyId(id);
+//    }
 
     /**
      * {@code PATCH  /submitInvoice} : submit invoice.
      *
      * @return the {@link ResponseEntity<DemandeAchatOutputDTO>}  with status {@code 201 (Created)} and with body the identified invoice recement initiated, or with status {@code 400 (Bad Request)} if the invoice no already has an ID.
      */
-    @PatchMapping("/submitInvoice")
-    public ResponseEntity<DemandeAchatOutputDTO> submitInvoice(@Valid @RequestBody DemandeAchatInputDTO demandeAchatInputDTO) throws Exception {
-        log.debug("REST request to submit invoice: " + demandeAchatInputDTO.toString());
+    @PatchMapping(value = {"/submitDA"})
+    public DemandeAchatOutputDTO submitRequestCase(@RequestBody DemandeAchatInputDTO requestCaseInputDTO) throws Exception {
 
+        // check if the conneceted person have role can create inbound
+        demandeAchatService.checkRole(currentUser.getProfileName(), kernelService.demande_achat_canCreateDA);
+
+        // extract acl class
         AclClass aclClass = kernelInterface.getaclClassByClassName(DemandeAchat.class.getName());
 
-        Long id = demandeAchatService.submitDemandeAchat(demandeAchatInputDTO, aclClass);
+        DemandeAchatOutputDTO result = demandeAchatService.submitProcessDemandeAchat(requestCaseInputDTO, aclClass);
 
-        DemandeAchatOutputDTO result=demandeAchatService.findOneById(id, aclClass);
+        return result;
+    }
 
-        return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-                .body(result);
+    @PatchMapping(value = {"/submitValidDA"})
+    public DemandeAchatOutputDTO submitValidRequestCase(@RequestBody DemandeAchatInputDTO requestCaseInputDTO, StatutDA statutDA) throws Exception {
 
+
+        // check if the conneceted person have role can create inbound
+        demandeAchatService.checkRole(currentUser.getProfileName(), kernelService.demande_achat_canCreateDA);
+
+        // extract acl class
+        AclClass aclClass = kernelInterface.getaclClassByClassName(DemandeAchat.class.getName());
+        requestCaseInputDTO.setStatut(statutDA.termine);
+        DemandeAchatOutputDTO result = demandeAchatService.submitProcessDemandeAchat(requestCaseInputDTO, aclClass);
+
+        return result;
     }
 }

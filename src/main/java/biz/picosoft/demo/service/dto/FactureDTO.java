@@ -3,23 +3,18 @@ package biz.picosoft.demo.service.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
-/**
- * A DTO for the {@link biz.picosoft.demo.domain.Facture} entity.
- */
+
 @Schema(description = "The Employee entity.")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class FactureDTO implements Serializable {
 
-    private Long id;
-
     /**
      * The firstname attribute.
      */
-
+    @Schema(description = "The firstname attribute.")
+    private Long id;
 
     private LocalDate datefacture;
 
@@ -53,9 +48,7 @@ public class FactureDTO implements Serializable {
 
     private String reference;
 
-    private Set<BonLivraisonDTO> bonlivraisons = new HashSet<>();
-
-    private BonCommandeDTO bonCcmmande;
+    private BonCommandeDTO bonCommande;
 
     public Long getId() {
         return id;
@@ -64,8 +57,6 @@ public class FactureDTO implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
     public LocalDate getDatefacture() {
         return datefacture;
@@ -195,20 +186,12 @@ public class FactureDTO implements Serializable {
         this.reference = reference;
     }
 
-    public Set<BonLivraisonDTO> getBonlivraisons() {
-        return bonlivraisons;
+    public BonCommandeDTO getBonCommande() {
+        return bonCommande;
     }
 
-    public void setBonlivraisons(Set<BonLivraisonDTO> bonlivraisons) {
-        this.bonlivraisons = bonlivraisons;
-    }
-
-    public BonCommandeDTO getBonCcmmande() {
-        return bonCcmmande;
-    }
-
-    public void setBonCcmmande(BonCommandeDTO bonCcmmande) {
-        this.bonCcmmande = bonCcmmande;
+    public void setBonCommande(BonCommandeDTO bonCommande) {
+        this.bonCommande = bonCommande;
     }
 
     @Override
@@ -253,8 +236,7 @@ public class FactureDTO implements Serializable {
             ", tva=" + getTva() +
             ", totalttc=" + getTotalttc() +
             ", reference='" + getReference() + "'" +
-            ", bonlivraisons=" + getBonlivraisons() +
-            ", bonCcmmande=" + getBonCcmmande() +
+            ", bonCommande=" + getBonCommande() +
             "}";
     }
 }

@@ -1,12 +1,11 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.domain.*; // for static metamodels
-import biz.picosoft.demo.domain.Offre;
+import biz.picosoft.demo.domain.*;
 import biz.picosoft.demo.repository.OffreRepository;
 import biz.picosoft.demo.service.criteria.OffreCriteria;
 import biz.picosoft.demo.service.dto.OffreDTO;
 import biz.picosoft.demo.service.mapper.OffreMapper;
-import javax.persistence.criteria.JoinType;
+
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
+
+import javax.persistence.criteria.JoinType;
 
 /**
  * Service for executing complex queries for {@link Offre} entities in the database.
@@ -90,7 +91,6 @@ public class OffreQueryService extends QueryService<Offre> {
             if (criteria.getId() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getId(), Offre_.id));
             }
-
             if (criteria.getPrix() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getPrix(), Offre_.prix));
             }
@@ -100,21 +100,18 @@ public class OffreQueryService extends QueryService<Offre> {
             if (criteria.getDescription() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getDescription(), Offre_.description));
             }
-            if (criteria.getBoncommandesId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(
-                            criteria.getBoncommandesId(),
-                            root -> root.join(Offre_.boncommandes, JoinType.LEFT).get(BonCommande_.id)
-                        )
-                    );
+            if (criteria.getReferenceoffre() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getReferenceoffre(), Offre_.referenceoffre));
             }
-            if (criteria.getFournisseurId() != null) {
+            if (criteria.getNom() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getNom(), Offre_.nom));
+            }
+            if (criteria.getBoncommandeId() != null) {
                 specification =
                     specification.and(
                         buildSpecification(
-                            criteria.getFournisseurId(),
-                            root -> root.join(Offre_.fournisseur, JoinType.LEFT).get(Fournisseur_.id)
+                            criteria.getBoncommandeId(),
+                            root -> root.join(Offre_.boncommandes, JoinType.LEFT).get(BonCommande_.id)
                         )
                     );
             }
@@ -127,10 +124,13 @@ public class OffreQueryService extends QueryService<Offre> {
                         )
                     );
             }
-            if (criteria.getProduitId() != null) {
+            if (criteria.getFournisseurId() != null) {
                 specification =
                     specification.and(
-                        buildSpecification(criteria.getProduitId(), root -> root.join(Offre_.produit, JoinType.LEFT).get(Produit_.id))
+                        buildSpecification(
+                            criteria.getFournisseurId(),
+                            root -> root.join(Offre_.fournisseur, JoinType.LEFT).get(Fournisseur_.id)
+                        )
                     );
             }
         }

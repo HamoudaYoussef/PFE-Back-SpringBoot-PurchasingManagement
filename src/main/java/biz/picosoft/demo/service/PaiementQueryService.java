@@ -1,12 +1,13 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.domain.*; // for static metamodels
+import biz.picosoft.demo.domain.Facture_;
 import biz.picosoft.demo.domain.Paiement;
+import biz.picosoft.demo.domain.Paiement_;
 import biz.picosoft.demo.repository.PaiementRepository;
 import biz.picosoft.demo.service.criteria.PaiementCriteria;
 import biz.picosoft.demo.service.dto.PaiementDTO;
 import biz.picosoft.demo.service.mapper.PaiementMapper;
-import javax.persistence.criteria.JoinType;
+
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
+
+import javax.persistence.criteria.JoinType;
 
 /**
  * Service for executing complex queries for {@link Paiement} entities in the database.
@@ -90,7 +93,6 @@ public class PaiementQueryService extends QueryService<Paiement> {
             if (criteria.getId() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getId(), Paiement_.id));
             }
-
             if (criteria.getMontanttotal() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getMontanttotal(), Paiement_.montanttotal));
             }

@@ -4,6 +4,7 @@ import biz.picosoft.demo.domain.Paiement;
 import biz.picosoft.demo.repository.PaiementRepository;
 import biz.picosoft.demo.service.dto.PaiementDTO;
 import biz.picosoft.demo.service.mapper.PaiementMapper;
+
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing {@link biz.picosoft.demo.domain.Paiement}.
- */
+
 @Service
 @Transactional
 public class PaiementService {

@@ -1,8 +1,9 @@
 package biz.picosoft.demo.repository;
 
-import biz.picosoft.demo.domain.Facture;
 import java.util.List;
 import java.util.Optional;
+
+import biz.picosoft.demo.domain.Facture;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;

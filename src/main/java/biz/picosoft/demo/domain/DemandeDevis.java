@@ -1,5 +1,6 @@
 package biz.picosoft.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,34 +10,47 @@ import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-
 /**
  * A DemandeDevis.
  */
 @Entity
-//@Table(name = "demande_devis", schema = "achat")
-@Table(name = "demande_devis")
+@Table(name = "demande_devis", schema = "achat")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class DemandeDevis implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "description")
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "demandeDevis")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "offres", "demandeDevis" }, allowSetters = true)
-    private Set<Produit> produits = new HashSet<>();
+    @Column(name = "quantite")
+    private Long quantite;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "demandeDevis")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "offres", "demandeDevis" }, allowSetters = true)
-    private Set<DemandeAchat> demandesachats = new HashSet<>();
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    @Column(name = "nom")
+    private String nom;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "offres", "demandedevis", "produit" }, allowSetters = true)
+    private Fournisseur fournisseur;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "offres", "demandedevis" }, allowSetters = true)
+    private DemandeAchat demandeAchat;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -66,65 +80,44 @@ public class DemandeDevis implements Serializable {
         this.description = description;
     }
 
-    public Set<Produit> getProduits() {
-        return this.produits;
+    public Long getQuantite() {
+        return this.quantite;
     }
 
-    public void setProduits(Set<Produit> produits) {
-        if (this.produits != null) {
-            this.produits.forEach(i -> i.setDemandedevis(null));
-        }
-        if (produits != null) {
-            produits.forEach(i -> i.setDemandedevis(this));
-        }
-        this.produits = produits;
-    }
-
-    public DemandeDevis produits(Set<Produit> produits) {
-        this.setProduits(produits);
+    public DemandeDevis quantite(Long quantite) {
+        this.setQuantite(quantite);
         return this;
     }
 
-    public DemandeDevis addProduits(Produit produit) {
-        this.produits.add(produit);
-        produit.setDemandedevis(this);
+    public void setQuantite(Long quantite) {
+        this.quantite = quantite;
+    }
+
+
+
+    public Fournisseur getFournisseur() {
+        return this.fournisseur;
+    }
+
+    public void setFournisseur(Fournisseur fournisseur) {
+        this.fournisseur = fournisseur;
+    }
+
+    public DemandeDevis fournisseur(Fournisseur fournisseur) {
+        this.setFournisseur(fournisseur);
         return this;
     }
 
-    public DemandeDevis removeProduits(Produit produit) {
-        this.produits.remove(produit);
-        produit.setDemandedevis(null);
-        return this;
+    public DemandeAchat getDemandeAchat() {
+        return this.demandeAchat;
     }
 
-    public Set<DemandeAchat> getDemandesachats() {
-        return this.demandesachats;
+    public void setDemandeAchat(DemandeAchat demandeAchat) {
+        this.demandeAchat = demandeAchat;
     }
 
-    public void setDemandesachats(Set<DemandeAchat> demandeAchats) {
-        if (this.demandesachats != null) {
-            this.demandesachats.forEach(i -> i.setDemandedevis(null));
-        }
-        if (demandeAchats != null) {
-            demandeAchats.forEach(i -> i.setDemandedevis(this));
-        }
-        this.demandesachats = demandeAchats;
-    }
-
-    public DemandeDevis demandesachats(Set<DemandeAchat> demandeAchats) {
-        this.setDemandesachats(demandeAchats);
-        return this;
-    }
-
-    public DemandeDevis addDemandesachat(DemandeAchat demandeAchat) {
-        this.demandesachats.add(demandeAchat);
-        demandeAchat.setDemandedevis(this);
-        return this;
-    }
-
-    public DemandeDevis removeDemandesachat(DemandeAchat demandeAchat) {
-        this.demandesachats.remove(demandeAchat);
-        demandeAchat.setDemandedevis(null);
+    public DemandeDevis demandeAchat(DemandeAchat demandeAchat) {
+        this.setDemandeAchat(demandeAchat);
         return this;
     }
 
@@ -151,8 +144,9 @@ public class DemandeDevis implements Serializable {
     @Override
     public String toString() {
         return "DemandeDevis{" +
-            "id=" + getId() +
-            ", description='" + getDescription() + "'" +
-            "}";
+                "id=" + getId() +
+                ", description='" + getDescription() + "'" +
+                ", quantite=" + getQuantite() +
+                "}";
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 @Configuration
 public class FeignConfig {
@@ -32,4 +33,9 @@ public class FeignConfig {
         return new SpringFormEncoder(new SpringEncoder(messageConverters));
     }
 
+
+    @Bean(name = "multipartResolver")
+    public CommonsMultipartResolver commonsMultipartResolver() {
+        return new CommonsMultipartResolver();
+    }
 }

@@ -4,23 +4,31 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link biz.picosoft.demo.domain.ProduitOffert} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProduitOffertDTO implements Serializable {
 
     private Long id;
 
+    private String nom;
 
-    private Long idproduit;
+    private String description;
 
-    private Long idoffre;
+    private Long quantite;
 
-    private Long quantiteofferte;
+    public Long getPrix() {
+        return prix;
+    }
 
-    private OffreDTO offre;
+    public void setPrix(Long prix) {
+        this.prix = prix;
+    }
 
-    private ProduitDTO produit;
+    private Long prix;
+
+    private Long fournisseurId;
+
+    private Long offreId;
 
     public Long getId() {
         return id;
@@ -30,46 +38,44 @@ public class ProduitOffertDTO implements Serializable {
         this.id = id;
     }
 
-
-
-    public Long getIdproduit() {
-        return idproduit;
+    public String getNom() {
+        return nom;
     }
 
-    public void setIdproduit(Long idproduit) {
-        this.idproduit = idproduit;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
-    public Long getIdoffre() {
-        return idoffre;
+    public String getDescription() {
+        return description;
     }
 
-    public void setIdoffre(Long idoffre) {
-        this.idoffre = idoffre;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public Long getQuantiteofferte() {
-        return quantiteofferte;
+    public Long getQuantite() {
+        return quantite;
     }
 
-    public void setQuantiteofferte(Long quantiteofferte) {
-        this.quantiteofferte = quantiteofferte;
+    public void setQuantite(Long quantite) {
+        this.quantite = quantite;
     }
 
-    public OffreDTO getOffre() {
-        return offre;
+    public Long getFournisseurId() {
+        return fournisseurId;
     }
 
-    public void setOffre(OffreDTO offre) {
-        this.offre = offre;
+    public void setFournisseurId(Long fournisseurId) {
+        this.fournisseurId = fournisseurId;
     }
 
-    public ProduitDTO getProduit() {
-        return produit;
+    public Long getOffreId() {
+        return offreId;
     }
 
-    public void setProduit(ProduitDTO produit) {
-        this.produit = produit;
+    public void setOffreId(Long offreId) {
+        this.offreId = offreId;
     }
 
     @Override
@@ -98,11 +104,11 @@ public class ProduitOffertDTO implements Serializable {
     public String toString() {
         return "ProduitOffertDTO{" +
             "id=" + getId() +
-            ", idproduit=" + getIdproduit() +
-            ", idoffre=" + getIdoffre() +
-            ", quantiteofferte=" + getQuantiteofferte() +
-            ", offre=" + getOffre() +
-            ", produit=" + getProduit() +
+            ", nomProduit='" + getNom() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", quantite=" + getQuantite() +
+            ", fournisseurId=" + getFournisseurId() +
+            ", offreId=" + getOffreId() +
             "}";
     }
 }

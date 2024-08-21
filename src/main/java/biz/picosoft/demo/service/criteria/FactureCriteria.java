@@ -2,15 +2,12 @@ package biz.picosoft.demo.service.criteria;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import org.springdoc.api.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * Criteria class for the {@link biz.picosoft.demo.domain.Facture} entity. This class is used
- * in {@link biz.picosoft.demo.web.rest.FactureResource} to receive all the possible filtering options from
- * the Http GET request parameters.
+
  * For example the following could be a valid request:
  * {@code /factures?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
  * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
@@ -23,7 +20,6 @@ public class FactureCriteria implements Serializable, Criteria {
     private static final long serialVersionUID = 1L;
 
     private LongFilter id;
-
 
     private LocalDateFilter datefacture;
 
@@ -57,11 +53,9 @@ public class FactureCriteria implements Serializable, Criteria {
 
     private StringFilter reference;
 
-    private LongFilter paiementsId;
+    private LongFilter paiementId;
 
-    private LongFilter bonlivraisonsId;
-
-    private LongFilter bonCcmmandeId;
+    private LongFilter bonCommandeId;
 
     private Boolean distinct;
 
@@ -85,9 +79,8 @@ public class FactureCriteria implements Serializable, Criteria {
         this.tva = other.tva == null ? null : other.tva.copy();
         this.totalttc = other.totalttc == null ? null : other.totalttc.copy();
         this.reference = other.reference == null ? null : other.reference.copy();
-        this.paiementsId = other.paiementsId == null ? null : other.paiementsId.copy();
-        this.bonlivraisonsId = other.bonlivraisonsId == null ? null : other.bonlivraisonsId.copy();
-        this.bonCcmmandeId = other.bonCcmmandeId == null ? null : other.bonCcmmandeId.copy();
+        this.paiementId = other.paiementId == null ? null : other.paiementId.copy();
+        this.bonCommandeId = other.bonCommandeId == null ? null : other.bonCommandeId.copy();
         this.distinct = other.distinct;
     }
 
@@ -110,7 +103,6 @@ public class FactureCriteria implements Serializable, Criteria {
     public void setId(LongFilter id) {
         this.id = id;
     }
-
 
     public LocalDateFilter getDatefacture() {
         return datefacture;
@@ -352,49 +344,34 @@ public class FactureCriteria implements Serializable, Criteria {
         this.reference = reference;
     }
 
-    public LongFilter getPaiementsId() {
-        return paiementsId;
+    public LongFilter getPaiementId() {
+        return paiementId;
     }
 
-    public LongFilter paiementsId() {
-        if (paiementsId == null) {
-            paiementsId = new LongFilter();
+    public LongFilter paiementId() {
+        if (paiementId == null) {
+            paiementId = new LongFilter();
         }
-        return paiementsId;
+        return paiementId;
     }
 
-    public void setPaiementsId(LongFilter paiementsId) {
-        this.paiementsId = paiementsId;
+    public void setPaiementId(LongFilter paiementId) {
+        this.paiementId = paiementId;
     }
 
-    public LongFilter getBonlivraisonsId() {
-        return bonlivraisonsId;
+    public LongFilter getBonCommandeId() {
+        return bonCommandeId;
     }
 
-    public LongFilter bonlivraisonsId() {
-        if (bonlivraisonsId == null) {
-            bonlivraisonsId = new LongFilter();
+    public LongFilter bonCommandeId() {
+        if (bonCommandeId == null) {
+            bonCommandeId = new LongFilter();
         }
-        return bonlivraisonsId;
+        return bonCommandeId;
     }
 
-    public void setBonlivraisonsId(LongFilter bonlivraisonsId) {
-        this.bonlivraisonsId = bonlivraisonsId;
-    }
-
-    public LongFilter getBonCcmmandeId() {
-        return bonCcmmandeId;
-    }
-
-    public LongFilter bonCcmmandeId() {
-        if (bonCcmmandeId == null) {
-            bonCcmmandeId = new LongFilter();
-        }
-        return bonCcmmandeId;
-    }
-
-    public void setBonCcmmandeId(LongFilter bonCcmmandeId) {
-        this.bonCcmmandeId = bonCcmmandeId;
+    public void setBonCommandeId(LongFilter bonCommandeId) {
+        this.bonCommandeId = bonCommandeId;
     }
 
     public Boolean getDistinct() {
@@ -432,9 +409,8 @@ public class FactureCriteria implements Serializable, Criteria {
             Objects.equals(tva, that.tva) &&
             Objects.equals(totalttc, that.totalttc) &&
             Objects.equals(reference, that.reference) &&
-            Objects.equals(paiementsId, that.paiementsId) &&
-            Objects.equals(bonlivraisonsId, that.bonlivraisonsId) &&
-            Objects.equals(bonCcmmandeId, that.bonCcmmandeId) &&
+            Objects.equals(paiementId, that.paiementId) &&
+            Objects.equals(bonCommandeId, that.bonCommandeId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -459,9 +435,8 @@ public class FactureCriteria implements Serializable, Criteria {
             tva,
             totalttc,
             reference,
-            paiementsId,
-            bonlivraisonsId,
-            bonCcmmandeId,
+            paiementId,
+            bonCommandeId,
             distinct
         );
     }
@@ -487,9 +462,8 @@ public class FactureCriteria implements Serializable, Criteria {
             (tva != null ? "tva=" + tva + ", " : "") +
             (totalttc != null ? "totalttc=" + totalttc + ", " : "") +
             (reference != null ? "reference=" + reference + ", " : "") +
-            (paiementsId != null ? "paiementsId=" + paiementsId + ", " : "") +
-            (bonlivraisonsId != null ? "bonlivraisonsId=" + bonlivraisonsId + ", " : "") +
-            (bonCcmmandeId != null ? "bonCcmmandeId=" + bonCcmmandeId + ", " : "") +
+            (paiementId != null ? "paiementId=" + paiementId + ", " : "") +
+            (bonCommandeId != null ? "bonCommandeId=" + bonCommandeId + ", " : "") +
             (distinct != null ? "distinct=" + distinct + ", " : "") +
             "}";
     }

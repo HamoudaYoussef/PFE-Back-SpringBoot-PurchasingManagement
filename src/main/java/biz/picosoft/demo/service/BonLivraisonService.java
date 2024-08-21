@@ -4,6 +4,7 @@ import biz.picosoft.demo.domain.BonLivraison;
 import biz.picosoft.demo.repository.BonLivraisonRepository;
 import biz.picosoft.demo.service.dto.BonLivraisonDTO;
 import biz.picosoft.demo.service.mapper.BonLivraisonMapper;
+
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing {@link biz.picosoft.demo.domain.BonLivraison}.
- */
+
 @Service
 @Transactional
 public class BonLivraisonService {

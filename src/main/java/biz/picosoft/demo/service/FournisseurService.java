@@ -1,9 +1,13 @@
 package biz.picosoft.demo.service;
 
+import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 import biz.picosoft.demo.domain.Fournisseur;
+import biz.picosoft.demo.domain.Produit;
 import biz.picosoft.demo.repository.FournisseurRepository;
 import biz.picosoft.demo.service.dto.FournisseurDTO;
 import biz.picosoft.demo.service.mapper.FournisseurMapper;
+
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing {@link biz.picosoft.demo.domain.Fournisseur}.
- */
+import static org.hibernate.id.IdentifierGenerator.ENTITY_NAME;
+
 @Service
 @Transactional
 public class FournisseurService {
@@ -50,10 +53,22 @@ public class FournisseurService {
      * @return the persisted entity.
      */
     public FournisseurDTO update(FournisseurDTO fournisseurDTO) {
-        log.debug("Request to update Fournisseur : {}", fournisseurDTO);
-        Fournisseur fournisseur = fournisseurMapper.toEntity(fournisseurDTO);
+        if (fournisseurDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idnull");
+        }
+
+        Fournisseur fournisseur = fournisseurRepository.findById(fournisseurDTO.getId())
+                .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        // Mettez à jour les champs du fournisseur avec les données du DTO
+        fournisseur.setNom(fournisseurDTO.getNom());
+        fournisseur.setAdresse(fournisseurDTO.getAdresse());
+        fournisseur.setTel(fournisseurDTO.getTel());
+
+        // Mettez à jour d'autres champs si nécessaire
+
         fournisseur = fournisseurRepository.save(fournisseur);
-        return fournisseurMapper.toDto(fournisseur);
+        return FournisseurDTO.fromFournisseur(fournisseur);
     }
 
     /**
@@ -108,5 +123,9 @@ public class FournisseurService {
     public void delete(Long id) {
         log.debug("Request to delete Fournisseur : {}", id);
         fournisseurRepository.deleteById(id);
+    }
+
+    public List<Produit> getProduitsByFournisseur(Long fournisseurId) {
+        return fournisseurRepository.findProduitsByFournisseurId(fournisseurId);
     }
 }

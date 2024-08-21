@@ -4,6 +4,7 @@ import biz.picosoft.demo.domain.Facture;
 import biz.picosoft.demo.repository.FactureRepository;
 import biz.picosoft.demo.service.dto.FactureDTO;
 import biz.picosoft.demo.service.mapper.FactureMapper;
+;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing {@link biz.picosoft.demo.domain.Facture}.
- */
+
 @Service
 @Transactional
 public class FactureService {
@@ -89,15 +88,6 @@ public class FactureService {
     }
 
     /**
-     * Get all the factures with eager load of many-to-many relationships.
-     *
-     * @return the list of entities.
-     */
-    public Page<FactureDTO> findAllWithEagerRelationships(Pageable pageable) {
-        return factureRepository.findAllWithEagerRelationships(pageable).map(factureMapper::toDto);
-    }
-
-    /**
      * Get one facture by id.
      *
      * @param id the id of the entity.
@@ -106,7 +96,7 @@ public class FactureService {
     @Transactional(readOnly = true)
     public Optional<FactureDTO> findOne(Long id) {
         log.debug("Request to get Facture : {}", id);
-        return factureRepository.findOneWithEagerRelationships(id).map(factureMapper::toDto);
+        return factureRepository.findById(id).map(factureMapper::toDto);
     }
 
     /**

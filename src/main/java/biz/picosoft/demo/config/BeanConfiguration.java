@@ -36,9 +36,24 @@ public class BeanConfiguration {
         }
     }
 
+    @Bean(name = "flowabledb")
+    public DataSource flowabledataSource() throws NamingException {
+        String jdbcUrl = environment.getProperty("jdbc.url");
+        if (jdbcUrl != null && !jdbcUrl.isEmpty())
+            return (DataSource) new JndiTemplate().lookup(jdbcUrl);
+        else {
+            DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+            dataSourceBuilder.driverClassName(environment.getProperty("spring.datasource.driverClassName"));
+            dataSourceBuilder.url(environment.getProperty("spring.datasource.url"));
+            dataSourceBuilder.username(environment.getProperty("spring.datasource.username"));
+            dataSourceBuilder.password(environment.getProperty("spring.datasource.password"));
+            return dataSourceBuilder.build();
+//            return null;
+        }
+    }
     @Bean(name = "jdbcTemplate")
     public JdbcTemplate jdbcTemplate(@Qualifier("db") DataSource ds) {
         return new JdbcTemplate(ds);
     }
-
 }
+

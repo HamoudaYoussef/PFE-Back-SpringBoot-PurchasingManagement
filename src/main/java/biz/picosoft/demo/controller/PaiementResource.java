@@ -152,7 +152,7 @@ public class PaiementResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of paiements in body.
      */
     @GetMapping("/getAll")
-    public ResponseEntity<List<PaiementDTO>> getAllPaiements(
+    public ResponseEntity<Page<PaiementDTO>> getAllPaiements(
         PaiementCriteria criteria,
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
@@ -160,7 +160,7 @@ public class PaiementResource {
 
         Page<PaiementDTO> page = paiementQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        return ResponseEntity.ok().headers(headers).body(page);
     }
 
     /**

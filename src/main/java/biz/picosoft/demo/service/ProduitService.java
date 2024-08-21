@@ -4,6 +4,8 @@ import biz.picosoft.demo.domain.Produit;
 import biz.picosoft.demo.repository.ProduitRepository;
 import biz.picosoft.demo.service.dto.ProduitDTO;
 import biz.picosoft.demo.service.mapper.ProduitMapper;
+
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing {@link biz.picosoft.demo.domain.Produit}.
- */
+
 @Service
 @Transactional
 public class ProduitService {
@@ -22,6 +22,7 @@ public class ProduitService {
     private final Logger log = LoggerFactory.getLogger(ProduitService.class);
 
     private final ProduitRepository produitRepository;
+
 
     private final ProduitMapper produitMapper;
 
@@ -87,6 +88,10 @@ public class ProduitService {
         log.debug("Request to get all Produits");
         return produitRepository.findAll(pageable).map(produitMapper::toDto);
     }
+    public List<ProduitDTO> findAllSimple() {
+        log.debug("Request to get all Produits");
+        return produitMapper.toDto(produitRepository.findAll());
+    }
 
     /**
      * Get one produit by id.
@@ -109,4 +114,33 @@ public class ProduitService {
         log.debug("Request to delete Produit : {}", id);
         produitRepository.deleteById(id);
     }
+
+  /*  public List<Produit> getProduitsByDemandeAchatId(Long demandeAchatId) {
+        List<Long> produitIds = produitDemandeeRepository.findDistinctProduitIdsByDemandeAchatId(demandeAchatId);
+        return produitRepository.findByIdIn(produitIds);
+    }
+    public List<Produit> getProduitsByFournisseur(Long fournisseurId) {
+        List<Long> produitIds = produitDemandeeRepository.findDistinctProduitIdsByDemandeAchatId(fournisseurId);
+        return produitRepository.findByIdIn(produitIds);
+    }*/
+    public String verifierStock(Long id) {
+        Optional<Produit> produitOpt = produitRepository.findById(id);
+
+        if (!produitOpt.isPresent()) {
+            return "Produit non trouvé";
+        }
+
+        Produit produit = produitOpt.get();
+
+        if (produit.getQuantite() == 0) {
+            return "Stock insuffisant : la quantité est 0";
+        }
+
+        if (produit.getQuantitedemandeur() > produit.getQuantite()) {
+            return "Stock insuffisant : la quantité demandée est supérieure à la quantité disponible";
+        }
+
+        return "Stock suffisant";
+    }
+
 }

@@ -1,47 +1,36 @@
 package biz.picosoft.demo.service.dto;
 
-import biz.picosoft.demo.domain.enumeration.UnitePoids;
-import biz.picosoft.demo.domain.enumeration.UniteSurface;
-import biz.picosoft.demo.domain.enumeration.UniteTaille;
-import biz.picosoft.demo.domain.enumeration.UniteVolume;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-/**
- * A DTO for the {@link biz.picosoft.demo.domain.Produit} entity.
- */
-@SuppressWarnings("common-java:DuplicatedBlocks")
+import java.io.Serializable;
+import java.util.Set;
+
 public class ProduitDTO implements Serializable {
 
     private Long id;
-
-
-    private LocalDate dateachat;
-
     private String description;
-
     private String nom;
+    private Long quantite;
 
-    private Long poids;
-
-    private String forme;
-
-    private Long taille;
-
+    private Long quantitedemandeur;
     private String couleur;
 
-    private UniteTaille untietaille;
 
-    private UnitePoids unitepoids;
+    public Boolean getStock() {
+        return stock;
+    }
 
-    private Long volume;
+    public void setStock(Boolean stock) {
+        this.stock = stock;
+    }
 
-    private UniteVolume unitevolume;
+    private Boolean stock;
 
-    private Long surface;
 
-    private UniteSurface unitesurface;
+    private Set<FournisseurDTO> fournisseurs;
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -49,16 +38,6 @@ public class ProduitDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-
-
-    public LocalDate getDateachat() {
-        return dateachat;
-    }
-
-    public void setDateachat(LocalDate dateachat) {
-        this.dateachat = dateachat;
     }
 
     public String getDescription() {
@@ -77,28 +56,20 @@ public class ProduitDTO implements Serializable {
         this.nom = nom;
     }
 
-    public Long getPoids() {
-        return poids;
+    public Long getQuantite() {
+        return quantite;
     }
 
-    public void setPoids(Long poids) {
-        this.poids = poids;
+    public void setQuantite(Long quantite) {
+        this.quantite = quantite;
     }
 
-    public String getForme() {
-        return forme;
+    public Long getQuantitedemandeur() {
+        return quantitedemandeur;
     }
 
-    public void setForme(String forme) {
-        this.forme = forme;
-    }
-
-    public Long getTaille() {
-        return taille;
-    }
-
-    public void setTaille(Long taille) {
-        this.taille = taille;
+    public void setQuantitedemandeur(Long quantitedemandeur) {
+        this.quantitedemandeur = quantitedemandeur;
     }
 
     public String getCouleur() {
@@ -109,93 +80,24 @@ public class ProduitDTO implements Serializable {
         this.couleur = couleur;
     }
 
-    public UniteTaille getUntietaille() {
-        return untietaille;
+    public Set<FournisseurDTO> getFournisseurs() {
+        return fournisseurs;
     }
 
-    public void setUntietaille(UniteTaille untietaille) {
-        this.untietaille = untietaille;
+    public void setFournisseurs(Set<FournisseurDTO> fournisseurs) {
+        this.fournisseurs = fournisseurs;
     }
 
-    public UnitePoids getUnitepoids() {
-        return unitepoids;
-    }
-
-    public void setUnitepoids(UnitePoids unitepoids) {
-        this.unitepoids = unitepoids;
-    }
-
-    public Long getVolume() {
-        return volume;
-    }
-
-    public void setVolume(Long volume) {
-        this.volume = volume;
-    }
-
-    public UniteVolume getUnitevolume() {
-        return unitevolume;
-    }
-
-    public void setUnitevolume(UniteVolume unitevolume) {
-        this.unitevolume = unitevolume;
-    }
-
-    public Long getSurface() {
-        return surface;
-    }
-
-    public void setSurface(Long surface) {
-        this.surface = surface;
-    }
-
-    public UniteSurface getUnitesurface() {
-        return unitesurface;
-    }
-
-    public void setUnitesurface(UniteSurface unitesurface) {
-        this.unitesurface = unitesurface;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ProduitDTO)) {
-            return false;
-        }
-
-        ProduitDTO produitDTO = (ProduitDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, produitDTO.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
-    }
-
-    // prettier-ignore
     @Override
     public String toString() {
         return "ProduitDTO{" +
-            "id=" + getId() +
-            ", dateachat='" + getDateachat() + "'" +
-            ", description='" + getDescription() + "'" +
-            ", nom='" + getNom() + "'" +
-            ", poids=" + getPoids() +
-            ", forme='" + getForme() + "'" +
-            ", taille=" + getTaille() +
-            ", couleur='" + getCouleur() + "'" +
-            ", untietaille='" + getUntietaille() + "'" +
-            ", unitepoids='" + getUnitepoids() + "'" +
-            ", volume=" + getVolume() +
-            ", unitevolume='" + getUnitevolume() + "'" +
-            ", surface=" + getSurface() +
-            ", unitesurface='" + getUnitesurface() + "'" +
-            "}";
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", nom='" + nom + '\'' +
+                ", quantite=" + quantite +
+                ", quantitedemandeur=" + quantitedemandeur +
+                ", couleur='" + couleur + '\'' +
+                ", fournisseurs=" + fournisseurs +
+                '}';
     }
 }

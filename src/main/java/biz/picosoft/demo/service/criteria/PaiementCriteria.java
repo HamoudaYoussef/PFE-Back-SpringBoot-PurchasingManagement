@@ -2,15 +2,12 @@ package biz.picosoft.demo.service.criteria;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import org.springdoc.api.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * Criteria class for the {@link biz.picosoft.demo.domain.Paiement} entity. This class is used
- * in {@link biz.picosoft.demo.web.rest.PaiementResource} to receive all the possible filtering options from
- * the Http GET request parameters.
+
  * For example the following could be a valid request:
  * {@code /paiements?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
  * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
@@ -23,7 +20,6 @@ public class PaiementCriteria implements Serializable, Criteria {
     private static final long serialVersionUID = 1L;
 
     private LongFilter id;
-
 
     private LongFilter montanttotal;
 
@@ -68,8 +64,6 @@ public class PaiementCriteria implements Serializable, Criteria {
     public void setId(LongFilter id) {
         this.id = id;
     }
-
-
 
     public LongFilter getMontanttotal() {
         return montanttotal;

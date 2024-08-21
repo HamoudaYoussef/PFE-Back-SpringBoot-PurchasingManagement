@@ -4,18 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.envers.Audited;
 
 /**
  * A BonLivraison.
  */
 @Entity
-//@Table(name = "bon_livraison", schema = "achat")
-@Table(name = "bon_livraison")
+@Table(name = "bon_livraison", schema = "achat")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class BonLivraison implements Serializable {
@@ -23,10 +19,10 @@ public class BonLivraison implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
     private Long id;
-
-
 
     @Column(name = "numerobonlivraison")
     private Long numerobonlivraison;
@@ -34,10 +30,9 @@ public class BonLivraison implements Serializable {
     @Column(name = "datelivraion")
     private LocalDate datelivraion;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "bonlivraisons")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "paiements", "bonlivraisons", "bonCcmmande" }, allowSetters = true)
-    private Set<Facture> factures = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "bonlivraisons", "factures", "offre", "demandedevis" }, allowSetters = true)
+    private BonCommande boncommande;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -53,8 +48,6 @@ public class BonLivraison implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
     public Long getNumerobonlivraison() {
         return this.numerobonlivraison;
@@ -82,34 +75,16 @@ public class BonLivraison implements Serializable {
         this.datelivraion = datelivraion;
     }
 
-    public Set<Facture> getFactures() {
-        return this.factures;
+    public BonCommande getBoncommande() {
+        return this.boncommande;
     }
 
-    public void setFactures(Set<Facture> factures) {
-        if (this.factures != null) {
-            this.factures.forEach(i -> i.removeBonlivraisons(this));
-        }
-        if (factures != null) {
-            factures.forEach(i -> i.addBonlivraisons(this));
-        }
-        this.factures = factures;
+    public void setBoncommande(BonCommande bonCommande) {
+        this.boncommande = bonCommande;
     }
 
-    public BonLivraison factures(Set<Facture> factures) {
-        this.setFactures(factures);
-        return this;
-    }
-
-    public BonLivraison addFacture(Facture facture) {
-        this.factures.add(facture);
-        facture.getBonlivraisons().add(this);
-        return this;
-    }
-
-    public BonLivraison removeFacture(Facture facture) {
-        this.factures.remove(facture);
-        facture.getBonlivraisons().remove(this);
+    public BonLivraison boncommande(BonCommande bonCommande) {
+        this.setBoncommande(bonCommande);
         return this;
     }
 

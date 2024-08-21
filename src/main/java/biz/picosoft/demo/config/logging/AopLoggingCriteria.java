@@ -11,7 +11,7 @@ import java.util.Objects;
 
 /**
  * Criteria class for the {@link biz.picosoft.demo.config.logging.domain.AopLogging} entity. This class is used
- * in {@link biz.picosoft.demo.config.logging.AopLoggingResource} to receive all the possible filtering options from
+ * in {@link AopLoggingResource} to receive all the possible filtering options from
  * the Http GET request parameters.
  * For example the following could be a valid request:
  * {@code /aop-loggings?id.greaterThan=5&attr1.contains=something&attr2.specified=false}

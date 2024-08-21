@@ -4,7 +4,11 @@ import biz.picosoft.demo.domain.ProduitOffert;
 import biz.picosoft.demo.repository.ProduitOffertRepository;
 import biz.picosoft.demo.service.dto.ProduitOffertDTO;
 import biz.picosoft.demo.service.mapper.ProduitOffertMapper;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -13,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link biz.picosoft.demo.domain.ProduitOffert}.
  */
 @Service
 @Transactional
@@ -108,5 +111,11 @@ public class ProduitOffertService {
     public void delete(Long id) {
         log.debug("Request to delete ProduitOffert : {}", id);
         produitOffertRepository.deleteById(id);
+    }
+    public List<ProduitOffertDTO> findByOffreId(Long offreId) {
+        List<ProduitOffert> produitOfferts = produitOffertRepository.findByOffreId(offreId);
+        return produitOfferts.stream()
+                .map(produitOffertMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

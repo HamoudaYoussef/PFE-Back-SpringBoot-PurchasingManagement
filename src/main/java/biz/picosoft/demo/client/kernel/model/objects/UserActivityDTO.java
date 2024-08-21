@@ -1,5 +1,7 @@
 package biz.picosoft.demo.client.kernel.model.objects;
 
+
+
 import biz.picosoft.demo.client.kernel.model.pm.ActivityType;
 
 import java.io.Serializable;

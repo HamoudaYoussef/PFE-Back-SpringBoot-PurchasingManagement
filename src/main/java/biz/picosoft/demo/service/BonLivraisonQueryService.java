@@ -1,12 +1,12 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.domain.*; // for static metamodels
+import biz.picosoft.demo.domain.BonCommande_;
 import biz.picosoft.demo.domain.BonLivraison;
+import biz.picosoft.demo.domain.BonLivraison_;
 import biz.picosoft.demo.repository.BonLivraisonRepository;
 import biz.picosoft.demo.service.criteria.BonLivraisonCriteria;
 import biz.picosoft.demo.service.dto.BonLivraisonDTO;
 import biz.picosoft.demo.service.mapper.BonLivraisonMapper;
-import javax.persistence.criteria.JoinType;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +16,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
+
+import javax.persistence.criteria.JoinType;
 
 /**
  * Service for executing complex queries for {@link BonLivraison} entities in the database.
@@ -90,7 +92,6 @@ public class BonLivraisonQueryService extends QueryService<BonLivraison> {
             if (criteria.getId() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getId(), BonLivraison_.id));
             }
-
             if (criteria.getNumerobonlivraison() != null) {
                 specification =
                     specification.and(buildRangeSpecification(criteria.getNumerobonlivraison(), BonLivraison_.numerobonlivraison));
@@ -98,12 +99,12 @@ public class BonLivraisonQueryService extends QueryService<BonLivraison> {
             if (criteria.getDatelivraion() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getDatelivraion(), BonLivraison_.datelivraion));
             }
-            if (criteria.getFactureId() != null) {
+            if (criteria.getBoncommandeId() != null) {
                 specification =
                     specification.and(
                         buildSpecification(
-                            criteria.getFactureId(),
-                            root -> root.join(BonLivraison_.factures, JoinType.LEFT).get(Facture_.id)
+                            criteria.getBoncommandeId(),
+                            root -> root.join(BonLivraison_.boncommande, JoinType.LEFT).get(BonCommande_.id)
                         )
                     );
             }

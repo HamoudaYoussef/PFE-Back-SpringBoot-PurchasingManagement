@@ -13,23 +13,21 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  * The Employee entity.
  */
 @Entity
-//@Table(name = "facture", schema = "achat")
-@Table(name = "facture")
+@Table(name = "facture", schema = "achat")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Facture implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     /**
      * The firstname attribute.
      */
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "datefacture")
     private LocalDate datefacture;
@@ -84,19 +82,9 @@ public class Facture implements Serializable {
     @JsonIgnoreProperties(value = { "facture" }, allowSetters = true)
     private Set<Paiement> paiements = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "rel_facture__bonlivraisons",
-        joinColumns = @JoinColumn(name = "facture_id"),
-        inverseJoinColumns = @JoinColumn(name = "bonlivraisons_id")
-    )
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "factures" }, allowSetters = true)
-    private Set<BonLivraison> bonlivraisons = new HashSet<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "factures", "offre" }, allowSetters = true)
-    private BonCommande bonCcmmande;
+    @JsonIgnoreProperties(value = { "bonlivraisons", "factures", "offre", "demandedevis" }, allowSetters = true)
+    private BonCommande bonCommande;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -112,8 +100,6 @@ public class Facture implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
     public LocalDate getDatefacture() {
         return this.datefacture;
@@ -342,51 +328,28 @@ public class Facture implements Serializable {
         return this;
     }
 
-    public Facture addPaiements(Paiement paiement) {
+    public Facture addPaiement(Paiement paiement) {
         this.paiements.add(paiement);
         paiement.setFacture(this);
         return this;
     }
 
-    public Facture removePaiements(Paiement paiement) {
+    public Facture removePaiement(Paiement paiement) {
         this.paiements.remove(paiement);
         paiement.setFacture(null);
         return this;
     }
 
-    public Set<BonLivraison> getBonlivraisons() {
-        return this.bonlivraisons;
+    public BonCommande getBonCommande() {
+        return this.bonCommande;
     }
 
-    public void setBonlivraisons(Set<BonLivraison> bonLivraisons) {
-        this.bonlivraisons = bonLivraisons;
+    public void setBonCommande(BonCommande bonCommande) {
+        this.bonCommande = bonCommande;
     }
 
-    public Facture bonlivraisons(Set<BonLivraison> bonLivraisons) {
-        this.setBonlivraisons(bonLivraisons);
-        return this;
-    }
-
-    public Facture addBonlivraisons(BonLivraison bonLivraison) {
-        this.bonlivraisons.add(bonLivraison);
-        return this;
-    }
-
-    public Facture removeBonlivraisons(BonLivraison bonLivraison) {
-        this.bonlivraisons.remove(bonLivraison);
-        return this;
-    }
-
-    public BonCommande getBonCcmmande() {
-        return this.bonCcmmande;
-    }
-
-    public void setBonCcmmande(BonCommande bonCommande) {
-        this.bonCcmmande = bonCommande;
-    }
-
-    public Facture bonCcmmande(BonCommande bonCommande) {
-        this.setBonCcmmande(bonCommande);
+    public Facture bonCommande(BonCommande bonCommande) {
+        this.setBonCommande(bonCommande);
         return this;
     }
 

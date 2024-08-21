@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * Service for executing complex queries for {@link AopLogging} entities in the database.
- * The main input is a {@link biz.picosoft.demo.config.logging.AopLoggingCriteria} which gets converted to {@link Specification},
+ * The main input is a {@link AopLoggingCriteria} which gets converted to {@link Specification},
  * in a way that all the filters must apply.
  * It returns a {@link List} of {@link AopLoggingDTO} or a {@link Page} of {@link AopLoggingDTO} which fulfills the criteria.
  */

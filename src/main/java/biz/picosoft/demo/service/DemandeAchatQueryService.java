@@ -1,12 +1,14 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.domain.*; // for static metamodels
 import biz.picosoft.demo.domain.DemandeAchat;
+import biz.picosoft.demo.domain.DemandeAchat_;
+import biz.picosoft.demo.domain.Offre_;
+import biz.picosoft.demo.domain.Produit_;
 import biz.picosoft.demo.repository.DemandeAchatRepository;
 import biz.picosoft.demo.service.criteria.DemandeAchatCriteria;
 import biz.picosoft.demo.service.dto.DemandeAchatDTO;
 import biz.picosoft.demo.service.mapper.DemandeAchatMapper;
-import javax.persistence.criteria.JoinType;
+
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
+
+import javax.persistence.criteria.JoinType;
 
 /**
  * Service for executing complex queries for {@link DemandeAchat} entities in the database.
@@ -90,19 +94,19 @@ public class DemandeAchatQueryService extends QueryService<DemandeAchat> {
             if (criteria.getId() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getId(), DemandeAchat_.id));
             }
-
             if (criteria.getDatedemande() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getDatedemande(), DemandeAchat_.datedemande));
             }
             if (criteria.getDescription() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getDescription(), DemandeAchat_.description));
             }
-            if (criteria.getOffresId() != null) {
+            if (criteria.getOffreId() != null) {
                 specification =
                     specification.and(
-                        buildSpecification(criteria.getOffresId(), root -> root.join(DemandeAchat_.offres, JoinType.LEFT).get(Offre_.id))
+                        buildSpecification(criteria.getOffreId(), root -> root.join(DemandeAchat_.offres, JoinType.LEFT).get(Offre_.id))
                     );
             }
+
         }
         return specification;
     }

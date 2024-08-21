@@ -11,20 +11,18 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  * A Paiement.
  */
 @Entity
-//@Table(name = "paiement", schema = "achat")
-@Table(name = "paiement")
-
+@Table(name = "paiement", schema = "achat")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
-
 public class Paiement implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
     private Long id;
-
 
     @Column(name = "montanttotal")
     private Long montanttotal;
@@ -39,7 +37,7 @@ public class Paiement implements Serializable {
     private String statuts;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "paiements", "bonlivraisons", "bonCcmmande" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "paiements", "bonCommande" }, allowSetters = true)
     private Facture facture;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -56,8 +54,6 @@ public class Paiement implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
     public Long getMontanttotal() {
         return this.montanttotal;

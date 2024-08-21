@@ -13,20 +13,29 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  * not an ignored comment
  */
 @Entity
-//@Table(name = "offre", schema = "achat")
-@Table(name = "offre")
+@Table(name = "offre", schema = "achat")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Offre implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
     private Long id;
 
+    public String getNom() {
+        return nom;
+    }
 
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    @Column(name = "nom")
+    private String nom;
     @Column(name = "prix")
     private Float prix;
 
@@ -36,21 +45,43 @@ public class Offre implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "referenceoffre")
+    private String referenceoffre;
+
+    public String getReferenceoffre() {
+        return referenceoffre;
+    }
+
+    public void setReferenceoffre(String referenceoffre) {
+        this.referenceoffre = referenceoffre;
+    }
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "offre")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "factures", "offre" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "bonlivraisons", "factures", "offre", "demandedevis" }, allowSetters = true)
     private Set<BonCommande> boncommandes = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Fournisseur fournisseur;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "offres" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "offres", "produits" }, allowSetters = true)
     private DemandeAchat demandeachat;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "offres" }, allowSetters = true)
-    private Produit produit;
+    @JsonIgnoreProperties(value = { "offres", "demandedevis", "produit" }, allowSetters = true)
+    private Fournisseur fournisseur;
+
+
+    public Set<ProduitOffert> getProduitOfferts() {
+        return produitOfferts;
+    }
+
+    public void setProduitOfferts(Set<ProduitOffert> produitOfferts) {
+        this.produitOfferts = produitOfferts;
+    }
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offre")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "fournisseur", "offre" }, allowSetters = true)
+    private Set<ProduitOffert>produitOfferts ;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -66,8 +97,6 @@ public class Offre implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
-
 
     public Float getPrix() {
         return this.prix;
@@ -127,28 +156,15 @@ public class Offre implements Serializable {
         return this;
     }
 
-    public Offre addBoncommandes(BonCommande bonCommande) {
+    public Offre addBoncommande(BonCommande bonCommande) {
         this.boncommandes.add(bonCommande);
         bonCommande.setOffre(this);
         return this;
     }
 
-    public Offre removeBoncommandes(BonCommande bonCommande) {
+    public Offre removeBoncommande(BonCommande bonCommande) {
         this.boncommandes.remove(bonCommande);
         bonCommande.setOffre(null);
-        return this;
-    }
-
-    public Fournisseur getFournisseur() {
-        return this.fournisseur;
-    }
-
-    public void setFournisseur(Fournisseur fournisseur) {
-        this.fournisseur = fournisseur;
-    }
-
-    public Offre fournisseur(Fournisseur fournisseur) {
-        this.setFournisseur(fournisseur);
         return this;
     }
 
@@ -165,16 +181,16 @@ public class Offre implements Serializable {
         return this;
     }
 
-    public Produit getProduit() {
-        return this.produit;
+    public Fournisseur getFournisseur() {
+        return this.fournisseur;
     }
 
-    public void setProduit(Produit produit) {
-        this.produit = produit;
+    public void setFournisseur(Fournisseur fournisseur) {
+        this.fournisseur = fournisseur;
     }
 
-    public Offre produit(Produit produit) {
-        this.setProduit(produit);
+    public Offre fournisseur(Fournisseur fournisseur) {
+        this.setFournisseur(fournisseur);
         return this;
     }
 

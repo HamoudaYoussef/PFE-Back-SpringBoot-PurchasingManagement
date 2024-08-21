@@ -1,22 +1,35 @@
 package biz.picosoft.demo.controller;
 
+import biz.picosoft.demo.client.kernel.intercomm.KernelInterface;
+import biz.picosoft.demo.client.kernel.intercomm.KernelService;
+import biz.picosoft.demo.client.kernel.model.acl.AclClass;
+import biz.picosoft.demo.client.kernel.model.global.CurrentUser;
+import biz.picosoft.demo.domain.BonCommande;
+import biz.picosoft.demo.domain.Offre;
+import biz.picosoft.demo.domain.ennumeration.StatutBonCommande;
+import biz.picosoft.demo.domain.ennumeration.StatutDA;
 import biz.picosoft.demo.repository.BonCommandeRepository;
 import biz.picosoft.demo.service.BonCommandeQueryService;
 import biz.picosoft.demo.service.BonCommandeService;
 import biz.picosoft.demo.service.criteria.BonCommandeCriteria;
-import biz.picosoft.demo.service.dto.BonCommandeDTO;
+import biz.picosoft.demo.service.dto.*;
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
+
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -44,14 +57,27 @@ public class BonCommandeResource {
 
     private final BonCommandeQueryService bonCommandeQueryService;
 
+    private final KernelInterface kernelInterface;
+
+    private final CurrentUser currentUser;
+
+
+    private final KernelService kernelService;
+
     public BonCommandeResource(
         BonCommandeService bonCommandeService,
         BonCommandeRepository bonCommandeRepository,
-        BonCommandeQueryService bonCommandeQueryService
+        BonCommandeQueryService bonCommandeQueryService,
+        KernelInterface kernelInterface,
+        CurrentUser currentUser,
+        KernelService kernelService
     ) {
         this.bonCommandeService = bonCommandeService;
         this.bonCommandeRepository = bonCommandeRepository;
         this.bonCommandeQueryService = bonCommandeQueryService;
+        this.kernelInterface = kernelInterface;
+        this.currentUser = currentUser;
+        this.kernelService = kernelService;
     }
 
     /**
@@ -147,20 +173,17 @@ public class BonCommandeResource {
     /**
      * {@code GET  /bon-commandes} : get all the bonCommandes.
      *
-     * @param pageable the pagination information.
      * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of bonCommandes in body.
      */
     @GetMapping("")
     public ResponseEntity<List<BonCommandeDTO>> getAllBonCommandes(
-        BonCommandeCriteria criteria,
-        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+        BonCommandeCriteria criteria
     ) {
         log.debug("REST request to get BonCommandes by criteria: {}", criteria);
 
-        Page<BonCommandeDTO> page = bonCommandeQueryService.findByCriteria(criteria, pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        List<BonCommandeDTO > list = bonCommandeQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(list);
     }
 
     /**
@@ -202,5 +225,63 @@ public class BonCommandeResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+    @PatchMapping("/initBonCommande/{idoffre}")
+    public BonCommandeOutputDTO initBonCommande(@PathVariable Long idoffre) throws Exception {
+
+        // check if the conneceted person have role can create inbound
+        bonCommandeService.checkRole(currentUser.getProfileName(), kernelService.canCreateBonCommande_achat);
+
+        // extract acl class
+        AclClass aclClass = kernelInterface.getaclClassByClassName(BonCommande.class.getName());
+        return bonCommandeService.initProcessBonCommande(aclClass,idoffre);
+
+    }
+
+    @GetMapping("/bonCommandeDTO/{id}")
+    BonCommandeOutputDTO getDemandeDTO(@PathVariable Long id) throws IOException, TemplateException {
+        return bonCommandeService.getbcDTObyId(id);
+    }
+    /**
+     * {@code PATCH  /submitInvoice} : submit invoice.
+     *
+     */
+    @PatchMapping(value = {"/submitBonCommande"})
+    public BonCommandeOutputDTO submitRequestCase(@RequestBody BonCommandeInputDTO requestCaseInputDTO) throws Exception {
+
+        // check if the conneceted person have role can create inbound
+        bonCommandeService.checkRole(currentUser.getProfileName(), kernelService.canCreateBonCommande_achat);
+
+        // extract acl class
+        AclClass aclClass = kernelInterface.getaclClassByClassName(BonCommande.class.getName());
+
+        BonCommandeOutputDTO result = bonCommandeService.submitProcessBonCommande(requestCaseInputDTO, aclClass);
+
+        return result;
+    }
+
+    @GetMapping("/{id}/offre")
+    public ResponseEntity<Offre> getOffreByBonCommandeId(@PathVariable Long id) {
+        Offre offre = bonCommandeService.getOffreByBonCommandeId(id);
+        if (offre != null) {
+            return new ResponseEntity<>(offre, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @GetMapping(value = "/{id}/referenceoffre", produces = "text/plain")
+    public ResponseEntity<String> getReferenceOffreByBonCommandeId(@PathVariable Long id) {
+        String referenceOffre = bonCommandeService.getReferenceOffreByBonCommandeId(id);
+        return ResponseEntity.ok(referenceOffre);
+    }
+    @GetMapping("/{id}/prixoffre")
+    public ResponseEntity<Float> getPrixOffreByBonCommandeId(@PathVariable Long id) {
+        Float prixOffre = bonCommandeService.getPrixOffreByBonCommandeId(id);
+        return ResponseEntity.ok(prixOffre);
+    }
+    @PutMapping("/{id}/changer-statut")
+    public ResponseEntity<String> changerStatutBC(@PathVariable long id, StatutBonCommande statutBC) {
+        bonCommandeService.updateStatutBC(id, statutBC.VALIDE);
+        return ResponseEntity.ok("Statut mis à jour avec succès !");
     }
 }

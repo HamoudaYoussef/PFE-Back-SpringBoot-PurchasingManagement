@@ -2,15 +2,12 @@ package biz.picosoft.demo.service.criteria;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import org.springdoc.api.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * Criteria class for the {@link biz.picosoft.demo.domain.Fournisseur} entity. This class is used
- * in {@link biz.picosoft.demo.web.rest.FournisseurResource} to receive all the possible filtering options from
- * the Http GET request parameters.
+
  * For example the following could be a valid request:
  * {@code /fournisseurs?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
  * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
@@ -24,12 +21,17 @@ public class FournisseurCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
-
     private StringFilter nom;
 
     private StringFilter adresse;
 
     private StringFilter tel;
+
+    private LongFilter offreId;
+
+    private LongFilter demandedevisId;
+
+    private LongFilter produitId;
 
     private Boolean distinct;
 
@@ -40,6 +42,9 @@ public class FournisseurCriteria implements Serializable, Criteria {
         this.nom = other.nom == null ? null : other.nom.copy();
         this.adresse = other.adresse == null ? null : other.adresse.copy();
         this.tel = other.tel == null ? null : other.tel.copy();
+        this.offreId = other.offreId == null ? null : other.offreId.copy();
+        this.demandedevisId = other.demandedevisId == null ? null : other.demandedevisId.copy();
+        this.produitId = other.produitId == null ? null : other.produitId.copy();
         this.distinct = other.distinct;
     }
 
@@ -62,7 +67,6 @@ public class FournisseurCriteria implements Serializable, Criteria {
     public void setId(LongFilter id) {
         this.id = id;
     }
-
 
     public StringFilter getNom() {
         return nom;
@@ -109,6 +113,51 @@ public class FournisseurCriteria implements Serializable, Criteria {
         this.tel = tel;
     }
 
+    public LongFilter getOffreId() {
+        return offreId;
+    }
+
+    public LongFilter offreId() {
+        if (offreId == null) {
+            offreId = new LongFilter();
+        }
+        return offreId;
+    }
+
+    public void setOffreId(LongFilter offreId) {
+        this.offreId = offreId;
+    }
+
+    public LongFilter getDemandedevisId() {
+        return demandedevisId;
+    }
+
+    public LongFilter demandedevisId() {
+        if (demandedevisId == null) {
+            demandedevisId = new LongFilter();
+        }
+        return demandedevisId;
+    }
+
+    public void setDemandedevisId(LongFilter demandedevisId) {
+        this.demandedevisId = demandedevisId;
+    }
+
+    public LongFilter getProduitId() {
+        return produitId;
+    }
+
+    public LongFilter produitId() {
+        if (produitId == null) {
+            produitId = new LongFilter();
+        }
+        return produitId;
+    }
+
+    public void setProduitId(LongFilter produitId) {
+        this.produitId = produitId;
+    }
+
     public Boolean getDistinct() {
         return distinct;
     }
@@ -131,13 +180,16 @@ public class FournisseurCriteria implements Serializable, Criteria {
             Objects.equals(nom, that.nom) &&
             Objects.equals(adresse, that.adresse) &&
             Objects.equals(tel, that.tel) &&
+            Objects.equals(offreId, that.offreId) &&
+            Objects.equals(demandedevisId, that.demandedevisId) &&
+            Objects.equals(produitId, that.produitId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nom, adresse, tel, distinct);
+        return Objects.hash(id, nom, adresse, tel, offreId, demandedevisId, produitId, distinct);
     }
 
     // prettier-ignore
@@ -148,6 +200,9 @@ public class FournisseurCriteria implements Serializable, Criteria {
             (nom != null ? "nom=" + nom + ", " : "") +
             (adresse != null ? "adresse=" + adresse + ", " : "") +
             (tel != null ? "tel=" + tel + ", " : "") +
+            (offreId != null ? "offreId=" + offreId + ", " : "") +
+            (demandedevisId != null ? "demandedevisId=" + demandedevisId + ", " : "") +
+            (produitId != null ? "produitId=" + produitId + ", " : "") +
             (distinct != null ? "distinct=" + distinct + ", " : "") +
             "}";
     }

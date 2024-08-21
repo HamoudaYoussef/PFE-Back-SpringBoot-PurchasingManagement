@@ -1,5 +1,8 @@
 package biz.picosoft.demo.controller;
 
+import biz.picosoft.demo.domain.DemandeAchat;
+import biz.picosoft.demo.domain.Fournisseur;
+import biz.picosoft.demo.domain.Offre;
 import biz.picosoft.demo.repository.OffreRepository;
 import biz.picosoft.demo.service.OffreQueryService;
 import biz.picosoft.demo.service.OffreService;
@@ -9,6 +12,7 @@ import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -147,7 +151,7 @@ public class OffreResource {
      * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of offres in body.
      */
-    @GetMapping("")
+    @GetMapping("/offres")
     public ResponseEntity<List<OffreDTO>> getAllOffres(
         OffreCriteria criteria,
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
@@ -185,7 +189,7 @@ public class OffreResource {
     }
 
     /**
-     * {@code DELETE  /offres/:id} : delete the "id" offre.
+     * {@code DELETE  /offres/:id} :  the "id" offre.
      *
      * @param id the id of the offreDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
@@ -198,5 +202,33 @@ public class OffreResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/recent")
+    public List<Offre> getRecentOffres() {
+        return offreService.findRecentOffres();
+    }
+    @GetMapping("/fournisseur/{fournisseurId}")
+    public List<Offre> getOffresByFournisseur(@PathVariable Long fournisseurId) {
+        return offreService.findOffresByFournisseur(fournisseurId);
+    }
+
+    @GetMapping("/demandeachat/{demandeachatId}")
+    public List<Offre> getOffresByDemandeAchat(@PathVariable Long demandeachatId) {
+        return offreService.findOffresByDemandeAchat(demandeachatId);
+    }
+    @GetMapping("/offres-par-fournisseur")
+    public Map<Fournisseur, List<Offre>> getOffresParFournisseur() {
+        return offreService.getOffresTriesParFournisseur();
+    }
+    @GetMapping("/offres-par-demandeachat")
+    public Map<DemandeAchat, List<Offre>> getOffresParDemandeAchat() {
+        return offreService.getOffresTriesParDemandeAchat();
+    }
+
+    @GetMapping("/{id}/fournisseur-name")
+    public String getFournisseurName(@PathVariable Long id) {
+        Offre offre = offreRepository.findById(id).orElseThrow();
+        return offre.getFournisseur().getNom();
     }
 }

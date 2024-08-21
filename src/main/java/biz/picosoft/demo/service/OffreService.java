@@ -1,10 +1,20 @@
 package biz.picosoft.demo.service;
 
+import biz.picosoft.demo.domain.DemandeAchat;
+import biz.picosoft.demo.domain.Fournisseur;
 import biz.picosoft.demo.domain.Offre;
+import biz.picosoft.demo.repository.DemandeAchatRepository;
+import biz.picosoft.demo.repository.FournisseurRepository;
 import biz.picosoft.demo.repository.OffreRepository;
 import biz.picosoft.demo.service.dto.OffreDTO;
 import biz.picosoft.demo.service.mapper.OffreMapper;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -12,9 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service Implementation for managing {@link biz.picosoft.demo.domain.Offre}.
- */
 @Service
 @Transactional
 public class OffreService {
@@ -22,12 +29,18 @@ public class OffreService {
     private final Logger log = LoggerFactory.getLogger(OffreService.class);
 
     private final OffreRepository offreRepository;
+    private final FournisseurRepository fournisseurRepository;
+    private final DemandeAchatRepository demandeAchatRepository;
+
+
 
     private final OffreMapper offreMapper;
 
-    public OffreService(OffreRepository offreRepository, OffreMapper offreMapper) {
+    public OffreService(OffreRepository offreRepository,DemandeAchatRepository demandeAchatRepository,FournisseurRepository fournisseurRepository, OffreMapper offreMapper) {
         this.offreRepository = offreRepository;
         this.offreMapper = offreMapper;
+        this.fournisseurRepository = fournisseurRepository;
+        this.demandeAchatRepository = demandeAchatRepository;
     }
 
     /**
@@ -89,15 +102,6 @@ public class OffreService {
     }
 
     /**
-     * Get all the offres with eager load of many-to-many relationships.
-     *
-     * @return the list of entities.
-     */
-    public Page<OffreDTO> findAllWithEagerRelationships(Pageable pageable) {
-        return offreRepository.findAllWithEagerRelationships(pageable).map(offreMapper::toDto);
-    }
-
-    /**
      * Get one offre by id.
      *
      * @param id the id of the entity.
@@ -106,7 +110,7 @@ public class OffreService {
     @Transactional(readOnly = true)
     public Optional<OffreDTO> findOne(Long id) {
         log.debug("Request to get Offre : {}", id);
-        return offreRepository.findOneWithEagerRelationships(id).map(offreMapper::toDto);
+        return offreRepository.findById(id).map(offreMapper::toDto);
     }
 
     /**
@@ -117,5 +121,38 @@ public class OffreService {
     public void delete(Long id) {
         log.debug("Request to delete Offre : {}", id);
         offreRepository.deleteById(id);
+    }
+    public List<Offre> findRecentOffres() {
+        return offreRepository.findRecentOffres();
+    }
+    public List<Offre> findOffresByFournisseur(Long fournisseurId) {
+        return offreRepository.findOffresByFournisseur(fournisseurId);
+    }
+
+    public List<Offre> findOffresByDemandeAchat(Long demandeachatId) {
+        return offreRepository.findOffresByDemandeAchat(demandeachatId);
+    }
+    public Map<Fournisseur, List<Offre>> getOffresTriesParFournisseur() {
+        List<Fournisseur> fournisseurs = fournisseurRepository.findAll();
+        return fournisseurs.stream()
+                .filter(fournisseur -> fournisseur.getOffres() != null && !fournisseur.getOffres().isEmpty())
+                .collect(Collectors.toMap(
+                        fournisseur -> fournisseur,
+                        fournisseur -> fournisseur.getOffres().stream()
+                                .sorted(Comparator.comparing(Offre::getDescription))
+                                .collect(Collectors.toList())
+                ));
+    }
+    public Map<DemandeAchat, List<Offre>> getOffresTriesParDemandeAchat() {
+        List<DemandeAchat> demandeachats = demandeAchatRepository.findAll();
+
+        return demandeachats.stream()
+                .filter(demandeAchat -> demandeAchat.getOffres() != null && !demandeAchat.getOffres().isEmpty())
+                .collect(Collectors.toMap(
+                        demandeAchat -> demandeAchat,
+                        demandeAchat -> demandeAchat.getOffres().stream()
+                                .sorted(Comparator.comparing(Offre::getDescription))
+                                .collect(Collectors.toList())
+                ));
     }
 }
