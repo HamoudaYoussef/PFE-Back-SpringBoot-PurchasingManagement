@@ -1,18 +1,14 @@
 package biz.picosoft.demo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.io.Serializable;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * A ProduitDemandee.
  */
 @Entity
 @Table(name = "produit_demandee", schema = "achat")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProduitDemandee implements Serializable {
 
@@ -23,66 +19,24 @@ public class ProduitDemandee implements Serializable {
     @SequenceGenerator(name = "sequenceGenerator")
     @Column(name = "id")
     private Long id;
+
     @Column(name = "description")
     private String description;
 
     @Column(name = "nom")
     private String nom;
+
     @Column(name = "quantite")
     private Long quantite;
 
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
     @Column(name = "img")
     private String img;
-    public DemandeDevis getDemandeDevis() {
-        return demandeDevis;
-    }
 
-    public void setDemandeDevis(DemandeDevis demandeDevis) {
-        this.demandeDevis = demandeDevis;
-    }
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Produit produit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "produitDemandees" }, allowSetters = true)
-    private DemandeDevis demandeDevis;
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getNom() {
-        return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
-    public Long getQuantite() {
-        return quantite;
-    }
-
-    public void setQuantite(Long quantite) {
-        this.quantite = quantite;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "offres", "demandedevis" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER)
     private DemandeAchat demandeAchat;
-
-
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -99,6 +53,71 @@ public class ProduitDemandee implements Serializable {
         this.id = id;
     }
 
+    public String getDescription() {
+        return this.description;
+    }
+
+    public ProduitDemandee description(String description) {
+        this.setDescription(description);
+        return this;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getNom() {
+        return this.nom;
+    }
+
+    public ProduitDemandee nom(String nom) {
+        this.setNom(nom);
+        return this;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public Long getQuantite() {
+        return this.quantite;
+    }
+
+    public ProduitDemandee quantite(Long quantite) {
+        this.setQuantite(quantite);
+        return this;
+    }
+
+    public void setQuantite(Long quantite) {
+        this.quantite = quantite;
+    }
+
+    public String getImg() {
+        return this.img;
+    }
+
+    public ProduitDemandee img(String img) {
+        this.setImg(img);
+        return this;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
+    public Produit getProduit() {
+        return this.produit;
+    }
+
+    public void setProduit(Produit produit) {
+        this.produit = produit;
+    }
+
+    public ProduitDemandee produit(Produit produit) {
+        this.setProduit(produit);
+        return this;
+    }
+
     public DemandeAchat getDemandeAchat() {
         return this.demandeAchat;
     }
@@ -111,16 +130,6 @@ public class ProduitDemandee implements Serializable {
         this.setDemandeAchat(demandeAchat);
         return this;
     }
-
-
-    public ProduitDemandee demandeDevis(DemandeDevis demandeDevis) {
-        this.setDemandeDevis(demandeDevis);
-        return this;
-    }
-
-
-
-
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
@@ -146,6 +155,10 @@ public class ProduitDemandee implements Serializable {
     public String toString() {
         return "ProduitDemandee{" +
             "id=" + getId() +
+            ", description='" + getDescription() + "'" +
+            ", nom='" + getNom() + "'" +
+            ", quantite=" + getQuantite() +
+            ", img='" + getImg() + "'" +
             "}";
     }
 }

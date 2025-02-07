@@ -1,45 +1,32 @@
 package biz.picosoft.demo.service.mapper;
 
-
-import biz.picosoft.demo.domain.DemandeAchat;
+import biz.picosoft.demo.domain.DemandeDevis;
 import biz.picosoft.demo.domain.Fournisseur;
 import biz.picosoft.demo.domain.Offre;
-import biz.picosoft.demo.domain.ProduitOffert;
-import biz.picosoft.demo.service.dto.DemandeAchatDTO;
+import biz.picosoft.demo.service.dto.DemandeDevisDTO;
 import biz.picosoft.demo.service.dto.FournisseurDTO;
 import biz.picosoft.demo.service.dto.OffreDTO;
-import biz.picosoft.demo.service.dto.ProduitOffertDTO;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
-
+/**
+ * Mapper for the entity {@link Offre} and its DTO {@link OffreDTO}.
+ */
 @Mapper(componentModel = "spring")
 public interface OffreMapper extends EntityMapper<OffreDTO, Offre> {
-
-    @Named("offreId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    OffreDTO toDtoOffreId(Offre offre);
-
-    @Mapping(target = "demandeachat", source = "demandeachat", qualifiedByName = "demandeAchatId")
     @Mapping(target = "fournisseur", source = "fournisseur", qualifiedByName = "fournisseurId")
-    @Mapping(target = "produitOfferts", source = "produitOfferts")
-    @Mapping(source = "demandeDevis.id", target = "demandeDevisId")
+    @Mapping(target = "demandeDevis", source = "demandeDevis", qualifiedByName = "demandeDevisId")
     OffreDTO toDto(Offre s);
-
-    @Named("demandeAchatId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    DemandeAchatDTO toDtoDemandeAchatId(DemandeAchat demandeAchat);
 
     @Named("fournisseurId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     FournisseurDTO toDtoFournisseurId(Fournisseur fournisseur);
 
-    @Named("produitOffertId")
+    @Named("demandeDevisId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    ProduitOffertDTO toDtoProduitOffertId(ProduitOffert produitOffert);
-
-
+    DemandeDevisDTO toDtoDemandeDevisId(DemandeDevis demandeDevis);
 }

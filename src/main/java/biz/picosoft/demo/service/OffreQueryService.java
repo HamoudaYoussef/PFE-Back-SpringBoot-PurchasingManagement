@@ -3,10 +3,14 @@ package biz.picosoft.demo.service;
 import biz.picosoft.demo.domain.*;
 import biz.picosoft.demo.repository.OffreRepository;
 import biz.picosoft.demo.service.criteria.OffreCriteria;
-import biz.picosoft.demo.service.dto.OffreDTO;
-import biz.picosoft.demo.service.mapper.OffreMapper;
 
 import java.util.List;
+
+import biz.picosoft.demo.service.dto.DemandeDevisDTO;
+import biz.picosoft.demo.service.dto.OffreDTO;
+import biz.picosoft.demo.service.mapper.DemandeDevisMapper;
+import biz.picosoft.demo.service.mapper.FournisseurMapper;
+import biz.picosoft.demo.service.mapper.OffreMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -33,14 +37,20 @@ public class OffreQueryService extends QueryService<Offre> {
     private final OffreRepository offreRepository;
 
     private final OffreMapper offreMapper;
+    private final FournisseurMapper fournisseurMapper;
+    private final DemandeDevisMapper demandeDevisMapper;
 
-    public OffreQueryService(OffreRepository offreRepository, OffreMapper offreMapper) {
+
+
+    public OffreQueryService(OffreRepository offreRepository, OffreMapper offreMapper,
+                             FournisseurMapper fournisseurMapper,DemandeDevisMapper demandeDevisMapper) {
         this.offreRepository = offreRepository;
         this.offreMapper = offreMapper;
+        this.fournisseurMapper = fournisseurMapper;
+        this.demandeDevisMapper = demandeDevisMapper;
     }
 
     /**
-     * Return a {@link List} of {@link OffreDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching entities.
      */
@@ -52,7 +62,6 @@ public class OffreQueryService extends QueryService<Offre> {
     }
 
     /**
-     * Return a {@link Page} of {@link OffreDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
      * @param page The page, which should be returned.
      * @return the matching entities.
@@ -61,7 +70,14 @@ public class OffreQueryService extends QueryService<Offre> {
     public Page<OffreDTO> findByCriteria(OffreCriteria criteria, Pageable page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final Specification<Offre> specification = createSpecification(criteria);
-        return offreRepository.findAll(specification, page).map(offreMapper::toDto);
+        return offreRepository.findAll(specification, page).map(offre -> {
+            offre.getFournisseur().getNom(); // Force le chargement de la relation fournisseur
+            offre.getDemandeDevis(); // Force le chargement de la relation demandeAchat
+            OffreDTO dto = offreMapper.toDto(offre);
+            dto.setFournisseur(fournisseurMapper.toDto(offre.getFournisseur())); // Mapper le fournisseur complet
+            dto.setDemandeDevis(demandeDevisMapper.toDto(offre.getDemandeDevis())); // Mapper la demande d'achat complète
+            return dto;
+        });
     }
 
     /**
@@ -106,24 +122,7 @@ public class OffreQueryService extends QueryService<Offre> {
             if (criteria.getNom() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getNom(), Offre_.nom));
             }
-            if (criteria.getBoncommandeId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(
-                            criteria.getBoncommandeId(),
-                            root -> root.join(Offre_.boncommandes, JoinType.LEFT).get(BonCommande_.id)
-                        )
-                    );
-            }
-            if (criteria.getDemandeachatId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(
-                            criteria.getDemandeachatId(),
-                            root -> root.join(Offre_.demandeachat, JoinType.LEFT).get(DemandeAchat_.id)
-                        )
-                    );
-            }
+
             if (criteria.getFournisseurId() != null) {
                 specification =
                     specification.and(

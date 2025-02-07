@@ -1,9 +1,53 @@
 package biz.picosoft.demo.service.dto;
 
 import java.io.Serializable;
+import java.util.Objects;
 
+/**
+ * A DTO for the {@link biz.picosoft.demo.domain.ProduitCommandee} entity.
+ */
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProduitCommandeeDTO implements Serializable {
+
     private Long id;
+
+    private String nom;
+
+    private String description;
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
+    private String img;
+
+
+    private Long quantite;
+
+
+    public ProduitDTO getProduit() {
+        return produit;
+    }
+
+    public void setProduit(ProduitDTO produit) {
+        this.produit = produit;
+    }
+
+    public DemandeDevisDTO getDemandeDevis() {
+        return demandeDevis;
+    }
+
+    public void setDemandeDevis(DemandeDevisDTO demandeDevis) {
+        this.demandeDevis = demandeDevis;
+    }
+
+    private ProduitDTO produit;
+
+    private DemandeDevisDTO demandeDevis;
 
     public Long getId() {
         return id;
@@ -21,14 +65,6 @@ public class ProduitCommandeeDTO implements Serializable {
         this.nom = nom;
     }
 
-    public Long getQuantite() {
-        return quantite;
-    }
-
-    public void setQuantite(Long quantite) {
-        this.quantite = quantite;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -37,28 +73,45 @@ public class ProduitCommandeeDTO implements Serializable {
         this.description = description;
     }
 
-    public Long getProduitId() {
-        return produitId;
+    public Long getQuantite() {
+        return quantite;
     }
 
-    public void setProduitId(Long produitId) {
-        this.produitId = produitId;
+    public void setQuantite(Long quantite) {
+        this.quantite = quantite;
     }
 
 
-    private String nom;
-    private Long quantite;
-    private String description;
 
-    private Long produitId;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ProduitCommandeeDTO)) {
+            return false;
+        }
 
-    public Long getDemandeDevisId() {
-        return demandeDevisId;
+        ProduitCommandeeDTO produitCommandeeDTO = (ProduitCommandeeDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, produitCommandeeDTO.id);
     }
 
-    public void setDemandeDevisId(Long demandeDevisId) {
-        this.demandeDevisId = demandeDevisId;
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
     }
 
-    private Long demandeDevisId;
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "ProduitCommandeeDTO{" +
+            "id=" + getId() +
+            ", nom='" + getNom() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", quantite=" + getQuantite() +
+            "}";
+    }
 }

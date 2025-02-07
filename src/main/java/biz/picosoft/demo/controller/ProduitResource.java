@@ -1,17 +1,12 @@
 package biz.picosoft.demo.controller;
 
-import biz.picosoft.demo.domain.Fournisseur;
 import biz.picosoft.demo.domain.Produit;
-import biz.picosoft.demo.domain.ennumeration.Categorie;
+import biz.picosoft.demo.domain.Categorie;
 import biz.picosoft.demo.errors.ResourceNotFoundException;
 import biz.picosoft.demo.repository.ProduitRepository;
 import biz.picosoft.demo.service.ProduitQueryService;
 import biz.picosoft.demo.service.ProduitService;
-import biz.picosoft.demo.service.criteria.BonCommandeCriteria;
 import biz.picosoft.demo.service.criteria.ProduitCriteria;
-import biz.picosoft.demo.service.dto.BonCommandeDTO;
-import biz.picosoft.demo.service.dto.FournisseurDTO;
-import biz.picosoft.demo.service.dto.ProduitDTO;
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 
 import java.io.IOException;
@@ -20,17 +15,15 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import biz.picosoft.demo.service.dto.ProduitDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -98,7 +91,6 @@ public class ProduitResource {
 
         // Create a new ProduitDTO object
         ProduitDTO produitDTO = new ProduitDTO();
-        produitDTO.setCouleur(couleur);
         produitDTO.setDescription(description);
         produitDTO.setNom(nom);
         produitDTO.setQuantite(quantite);
@@ -240,6 +232,11 @@ public class ProduitResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/byCategorie/{categorieId}")
+    public List<Produit> getProduitsByCategorie(@PathVariable Long categorieId) {
+        return produitService.getProduitsByCategorie(categorieId);
     }
 
    /* @GetMapping("/demande-achat/{demandeAchatId}")

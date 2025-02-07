@@ -1,9 +1,11 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.domain.DemandeDevis;
-import biz.picosoft.demo.domain.ProduitCommandee;
+import biz.picosoft.demo.domain.*;
+import biz.picosoft.demo.errors.ResourceNotFoundException;
 import biz.picosoft.demo.repository.DemandeDevisRepository;
+import biz.picosoft.demo.repository.OffreRepository;
 import biz.picosoft.demo.repository.ProduitCommandeeRepository;
+import biz.picosoft.demo.repository.ProduitOffertRepository;
 import biz.picosoft.demo.service.dto.ProduitCommandeeDTO;
 import biz.picosoft.demo.service.mapper.ProduitCommandeeMapper;
 import org.slf4j.Logger;
@@ -12,8 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.persistence.EntityNotFoundException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,15 +28,21 @@ public class ProduitCommandeeService {
     private final Logger log = LoggerFactory.getLogger(ProduitCommandeeService.class);
 
     private final ProduitCommandeeRepository produitCommandeeRepository;
+    private final ProduitOffertRepository produitOffertRepository;
+    private final OffreRepository offreRepository;
+
+
     private final DemandeDevisRepository demandeDevisRepository;
 
     private final ProduitCommandeeMapper produitCommandeeMapper;
 
-    public ProduitCommandeeService(ProduitCommandeeRepository produitCommandeeRepository,
-                                   DemandeDevisRepository demandeDevisRepository,ProduitCommandeeMapper produitCommandeeMapper) {
+    public ProduitCommandeeService(ProduitCommandeeRepository produitCommandeeRepository,ProduitOffertRepository produitOffertRepository,
+                                   DemandeDevisRepository demandeDevisRepository,ProduitCommandeeMapper produitCommandeeMapper,OffreRepository offreRepository) {
         this.produitCommandeeRepository = produitCommandeeRepository;
         this.produitCommandeeMapper = produitCommandeeMapper;
         this.demandeDevisRepository = demandeDevisRepository;
+        this.produitOffertRepository = produitOffertRepository;
+        this.offreRepository = offreRepository;
     }
 
     /**
@@ -45,7 +55,6 @@ public class ProduitCommandeeService {
         log.debug("Request to save ProduitCommandee : {}", produitCommandeeDTO);
 
         ProduitCommandee produitCommandee = produitCommandeeMapper.toEntity(produitCommandeeDTO);
-
         produitCommandee = produitCommandeeRepository.save(produitCommandee);
         return produitCommandeeMapper.toDto(produitCommandee);
     }
@@ -84,4 +93,14 @@ public class ProduitCommandeeService {
         log.debug("Request to delete ProduitCommandee : {}", id);
         produitCommandeeRepository.deleteById(id);
     }
+
+    public List<ProduitCommandee> getProduitCommandeByDemandeDevisId(Long demandeDevisId) {
+        return produitCommandeeRepository.findByDemandeDevis_Id(demandeDevisId);
+    }
+    @Transactional(readOnly = true)
+    public DemandeDevis getDemandeDevisByProduitCommandee(Long produitCommandeeId) {
+        return produitCommandeeRepository.getDemandeDevisByProduitCommandeeId(produitCommandeeId);
+    }
+
+
 }

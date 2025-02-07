@@ -1,16 +1,18 @@
 package biz.picosoft.demo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
+/**
+ * A ProduitCommandee.
+ */
 @Entity
 @Table(name = "produit_commandee", schema = "achat")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProduitCommandee implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -22,9 +24,53 @@ public class ProduitCommandee implements Serializable {
     @Column(name = "nom")
     private String nom;
 
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "quantite")
+    private Long quantite;
+
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
+    @Column(name = "img")
+    private String img;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Produit produit;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties(value = { "fournisseur", "demandeAchat" }, allowSetters = true)
+    private DemandeDevis demandeDevis;
+
+    // jhipster-needle-entity-add-field - JHipster will add fields here
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public ProduitCommandee id(Long id) {
+        this.setId(id);
+        return this;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getNom() {
-        return nom;
+        return this.nom;
+    }
+
+    public ProduitCommandee nom(String nom) {
+        this.setNom(nom);
+        return this;
     }
 
     public void setNom(String nom) {
@@ -32,29 +78,25 @@ public class ProduitCommandee implements Serializable {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
+    }
+
+    public ProduitCommandee description(String description) {
+        this.setDescription(description);
+        return this;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    @Column(name = "description")
-    private String description;
-    @Column(name = "quantite")
-    private Long quantite;
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Long getQuantite() {
-        return quantite;
+        return this.quantite;
+    }
+
+    public ProduitCommandee quantite(Long quantite) {
+        this.setQuantite(quantite);
+        return this;
     }
 
     public void setQuantite(Long quantite) {
@@ -62,29 +104,58 @@ public class ProduitCommandee implements Serializable {
     }
 
     public Produit getProduit() {
-        return produit;
+        return this.produit;
     }
 
     public void setProduit(Produit produit) {
         this.produit = produit;
     }
 
+    public ProduitCommandee produit(Produit produit) {
+        this.setProduit(produit);
+        return this;
+    }
+
     public DemandeDevis getDemandeDevis() {
-        return demandeDevis;
+        return this.demandeDevis;
     }
 
     public void setDemandeDevis(DemandeDevis demandeDevis) {
         this.demandeDevis = demandeDevis;
     }
 
+    public ProduitCommandee demandeDevis(DemandeDevis demandeDevis) {
+        this.setDemandeDevis(demandeDevis);
+        return this;
+    }
 
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ProduitCommandee)) {
+            return false;
+        }
+        return getId() != null && getId().equals(((ProduitCommandee) o).getId());
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JsonIgnoreProperties(value = { "produitCommandees" }, allowSetters = true)
-    private Produit produit;
+    @Override
+    public int hashCode() {
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "produitCommandees" }, allowSetters = true)
-    private DemandeDevis demandeDevis;
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "ProduitCommandee{" +
+            "id=" + getId() +
+            ", nom='" + getNom() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", quantite=" + getQuantite() +
+            "}";
+    }
 }

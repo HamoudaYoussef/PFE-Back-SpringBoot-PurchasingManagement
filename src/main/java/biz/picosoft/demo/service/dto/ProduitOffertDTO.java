@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * A DTO for the {@link biz.picosoft.demo.domain.ProduitOffert} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProduitOffertDTO implements Serializable {
@@ -12,23 +13,36 @@ public class ProduitOffertDTO implements Serializable {
 
     private String nom;
 
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
+    private String img;
+
+
     private String description;
 
     private Long quantite;
 
-    public Long getPrix() {
-        return prix;
-    }
-
-    public void setPrix(Long prix) {
-        this.prix = prix;
-    }
-
     private Long prix;
 
-    private Long fournisseurId;
+    private ProduitDTO produit;
 
-    private Long offreId;
+    private OffreDTO offre;
+
+    public BonCommandeDTO getBonCommande() {
+        return bonCommande;
+    }
+
+    public void setBonCommande(BonCommandeDTO bonCommande) {
+        this.bonCommande = bonCommande;
+    }
+
+    private BonCommandeDTO bonCommande;
 
     public Long getId() {
         return id;
@@ -62,20 +76,28 @@ public class ProduitOffertDTO implements Serializable {
         this.quantite = quantite;
     }
 
-    public Long getFournisseurId() {
-        return fournisseurId;
+    public Long getPrix() {
+        return prix;
     }
 
-    public void setFournisseurId(Long fournisseurId) {
-        this.fournisseurId = fournisseurId;
+    public void setPrix(Long prix) {
+        this.prix = prix;
     }
 
-    public Long getOffreId() {
-        return offreId;
+    public ProduitDTO getProduit() {
+        return produit;
     }
 
-    public void setOffreId(Long offreId) {
-        this.offreId = offreId;
+    public void setProduit(ProduitDTO produit) {
+        this.produit = produit;
+    }
+
+    public OffreDTO getOffre() {
+        return offre;
+    }
+
+    public void setOffre(OffreDTO offre) {
+        this.offre = offre;
     }
 
     @Override
@@ -104,11 +126,12 @@ public class ProduitOffertDTO implements Serializable {
     public String toString() {
         return "ProduitOffertDTO{" +
             "id=" + getId() +
-            ", nomProduit='" + getNom() + "'" +
+            ", nom='" + getNom() + "'" +
             ", description='" + getDescription() + "'" +
             ", quantite=" + getQuantite() +
-            ", fournisseurId=" + getFournisseurId() +
-            ", offreId=" + getOffreId() +
+            ", prix=" + getPrix() +
+            ", produit=" + getProduit() +
+            ", offre=" + getOffre() +
             "}";
     }
 }

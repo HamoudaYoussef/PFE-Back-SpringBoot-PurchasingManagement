@@ -1,11 +1,9 @@
 package biz.picosoft.demo.service.criteria;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Objects;
 
 import biz.picosoft.demo.domain.ennumeration.InfoPaiement;
-import biz.picosoft.demo.domain.ennumeration.StatutBonCommande;
 import biz.picosoft.demo.domain.ennumeration.TypeLivraison;
 import org.springdoc.api.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
@@ -33,17 +31,6 @@ public class BonCommandeCriteria implements Serializable, Criteria {
     private StringFilter adresseentreprise;
 
     private LocalDateFilter delailivraison;
-
-
-    public StatutBonCommandeFilter getStatutbc() {
-        return statutbc;
-    }
-
-    public void setStatutbc(StatutBonCommandeFilter statutbc) {
-        this.statutbc = statutbc;
-    }
-
-    private StatutBonCommandeFilter statutbc;
 
     public TypeLivraisonFilter getTypeLivraison() {
         return typeLivraison;
@@ -136,13 +123,18 @@ public class BonCommandeCriteria implements Serializable, Criteria {
 
 
 
-    private LongFilter bonlivraisonId;
 
-    private LongFilter factureId;
 
-    private LongFilter offreId;
+    public LongFilter getProduitOffertId() {
+        return produitOffertId;
+    }
 
-    private LongFilter demandedevisId;
+    public void setProduitOffertId(LongFilter produitOffertId) {
+        this.produitOffertId = produitOffertId;
+    }
+
+    private LongFilter produitOffertId;
+
 
     private Boolean distinct;
 
@@ -156,16 +148,12 @@ public class BonCommandeCriteria implements Serializable, Criteria {
         this.adresseentreprise = other.adresseentreprise == null ? null : other.adresseentreprise.copy();
         this.delailivraison = other.delailivraison == null ? null : other.delailivraison.copy();
         this.fraislivraison = other.fraislivraison == null ? null : other.fraislivraison.copy();
-        this.statutbc = other.statutbc == null ? null : other.statutbc.copy();
         this.typeLivraison = other.typeLivraison == null ? null : other.typeLivraison.copy();
         this.infoPaiement = other.infoPaiement == null ? null : other.infoPaiement.copy();
         this.taxes = other.taxes == null ? null : other.taxes.copy();
         this.montanttotal = other.montanttotal == null ? null : other.montanttotal.copy();
         this.signature = other.signature == null ? null : other.signature.copy();
-        this.bonlivraisonId = other.bonlivraisonId == null ? null : other.bonlivraisonId.copy();
-        this.factureId = other.factureId == null ? null : other.factureId.copy();
-        this.offreId = other.offreId == null ? null : other.offreId.copy();
-        this.demandedevisId = other.demandedevisId == null ? null : other.demandedevisId.copy();
+        this.produitOffertId = other.produitOffertId == null ? null : other.produitOffertId.copy();
         this.distinct = other.distinct;
     }
 
@@ -219,65 +207,11 @@ public class BonCommandeCriteria implements Serializable, Criteria {
         this.reference = reference;
     }
 
-    public LongFilter getBonlivraisonId() {
-        return bonlivraisonId;
-    }
 
-    public LongFilter bonlivraisonId() {
-        if (bonlivraisonId == null) {
-            bonlivraisonId = new LongFilter();
-        }
-        return bonlivraisonId;
-    }
 
-    public void setBonlivraisonId(LongFilter bonlivraisonId) {
-        this.bonlivraisonId = bonlivraisonId;
-    }
 
-    public LongFilter getFactureId() {
-        return factureId;
-    }
 
-    public LongFilter factureId() {
-        if (factureId == null) {
-            factureId = new LongFilter();
-        }
-        return factureId;
-    }
 
-    public void setFactureId(LongFilter factureId) {
-        this.factureId = factureId;
-    }
-
-    public LongFilter getOffreId() {
-        return offreId;
-    }
-
-    public LongFilter offreId() {
-        if (offreId == null) {
-            offreId = new LongFilter();
-        }
-        return offreId;
-    }
-
-    public void setOffreId(LongFilter offreId) {
-        this.offreId = offreId;
-    }
-
-    public LongFilter getDemandedevisId() {
-        return demandedevisId;
-    }
-
-    public LongFilter demandedevisId() {
-        if (demandedevisId == null) {
-            demandedevisId = new LongFilter();
-        }
-        return demandedevisId;
-    }
-
-    public void setDemandedevisId(LongFilter demandedevisId) {
-        this.demandedevisId = demandedevisId;
-    }
 
     public Boolean getDistinct() {
         return distinct;
@@ -308,11 +242,7 @@ public class BonCommandeCriteria implements Serializable, Criteria {
                     Objects.equals(taxes, that.taxes) &&
                     Objects.equals(montanttotal, that.montanttotal) && Objects.equals(signature, that.signature) &&
                     Objects.equals(infoPaiement, that.infoPaiement) &&
-                    Objects.equals(statutbc, that.statutbc) &&
-                    Objects.equals(bonlivraisonId, that.bonlivraisonId) &&
-            Objects.equals(factureId, that.factureId) &&
-            Objects.equals(offreId, that.offreId) &&
-            Objects.equals(demandedevisId, that.demandedevisId) &&
+            Objects.equals(produitOffertId, that.produitOffertId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -331,12 +261,8 @@ public class BonCommandeCriteria implements Serializable, Criteria {
             taxes,
             montanttotal,
             signature,
-            statutbc,
             infoPaiement,
-            bonlivraisonId,
-            factureId,
-            offreId,
-            demandedevisId,
+                produitOffertId,
             distinct
         );
     }
@@ -348,25 +274,11 @@ public class BonCommandeCriteria implements Serializable, Criteria {
             (id != null ? "id=" + id + ", " : "") +
             (dateboncommande != null ? "dateboncommande=" + dateboncommande + ", " : "") +
             (reference != null ? "reference=" + reference + ", " : "") +
-            (bonlivraisonId != null ? "bonlivraisonId=" + bonlivraisonId + ", " : "") +
-            (factureId != null ? "factureId=" + factureId + ", " : "") +
-            (offreId != null ? "offreId=" + offreId + ", " : "") +
-            (demandedevisId != null ? "demandedevisId=" + demandedevisId + ", " : "") +
+            (produitOffertId != null ? "produitOffertId=" + produitOffertId + ", " : "") +
             (distinct != null ? "distinct=" + distinct + ", " : "") +
             "}";
     }
-    public static class StatutBonCommandeFilter extends Filter<StatutBonCommande> {
-        public StatutBonCommandeFilter() {};
-        public StatutBonCommandeFilter(StatutBonCommandeFilter filter) {
-            super(filter);
-        };
-        @Override
-        public StatutBonCommandeFilter copy() {
-            return new StatutBonCommandeFilter(this);
 
-        }
-
-    }
     public static class TypeLivraisonFilter extends Filter<TypeLivraison> {
         public TypeLivraisonFilter() {};
         public TypeLivraisonFilter(TypeLivraisonFilter filter) {

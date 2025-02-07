@@ -1,22 +1,15 @@
 package biz.picosoft.demo.domain;
 
-import biz.picosoft.demo.domain.ennumeration.Categorie;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * A Produit.
  */
 @Entity
 @Table(name = "produit", schema = "achat")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Produit implements Serializable {
 
@@ -28,24 +21,19 @@ public class Produit implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "description")
+    @Column(name = "description",length = 500)
     private String description;
 
     @Column(name = "nom")
     private String nom;
 
-    public Long getQuantite() {
-        return quantite;
-    }
-
-    public void setQuantite(Long quantite) {
-        this.quantite = quantite;
-    }
-
     @Column(name = "quantite")
     private Long quantite;
 
 
+
+    @Column(name = "img")
+    private String img;
 
 
     public Categorie getCategorie() {
@@ -56,35 +44,8 @@ public class Produit implements Serializable {
         this.categorie = categorie;
     }
 
-    @Column(name = "categorie")
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Categorie categorie;
-
-    @Column(name = "couleur")
-    private String couleur;
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
-    @Column(name = "img")
-    private String img;
-
-
-
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "produit")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "offres", "demandedevis", "produit" }, allowSetters = true)
-    private Set<Fournisseur> fournisseurs = new HashSet<>();
-
-
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
         return this.id;
@@ -98,7 +59,6 @@ public class Produit implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
 
     public String getDescription() {
         return this.description;
@@ -126,52 +86,31 @@ public class Produit implements Serializable {
         this.nom = nom;
     }
 
-
-
-    public String getCouleur() {
-        return this.couleur;
+    public Long getQuantite() {
+        return this.quantite;
     }
 
-    public Produit couleur(String couleur) {
-        this.setCouleur(couleur);
+    public Produit quantite(Long quantite) {
+        this.setQuantite(quantite);
         return this;
     }
 
-    public void setCouleur(String couleur) {
-        this.couleur = couleur;
+    public void setQuantite(Long quantite) {
+        this.quantite = quantite;
     }
 
 
-
-    public Set<Fournisseur> getFournisseurs() {
-        return this.fournisseurs;
+    public String getImg() {
+        return this.img;
     }
 
-    public void setFournisseurs(Set<Fournisseur> fournisseurs) {
-        if (this.fournisseurs != null) {
-            this.fournisseurs.forEach(i -> i.setProduit(null));
-        }
-        if (fournisseurs != null) {
-            fournisseurs.forEach(i -> i.setProduit(this));
-        }
-        this.fournisseurs = fournisseurs;
-    }
-
-    public Produit fournisseurs(Set<Fournisseur> fournisseurs) {
-        this.setFournisseurs(fournisseurs);
+    public Produit img(String img) {
+        this.setImg(img);
         return this;
     }
 
-    public Produit addFournisseur(Fournisseur fournisseur) {
-        this.fournisseurs.add(fournisseur);
-        fournisseur.setProduit(this);
-        return this;
-    }
-
-    public Produit removeFournisseur(Fournisseur fournisseur) {
-        this.fournisseurs.remove(fournisseur);
-        fournisseur.setProduit(null);
-        return this;
+    public void setImg(String img) {
+        this.img = img;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -200,8 +139,9 @@ public class Produit implements Serializable {
             "id=" + getId() +
             ", description='" + getDescription() + "'" +
             ", nom='" + getNom() + "'" +
-            ", couleur='" + getCouleur() + "'" +
-
+            ", quantite=" + getQuantite() +
+            ", categorie='" + getCategorie() + "'" +
+            ", img='" + getImg() + "'" +
             "}";
     }
 }

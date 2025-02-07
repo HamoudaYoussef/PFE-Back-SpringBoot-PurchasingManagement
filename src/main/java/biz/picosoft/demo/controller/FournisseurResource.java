@@ -6,23 +6,19 @@ import biz.picosoft.demo.errors.ResourceNotFoundException;
 import biz.picosoft.demo.repository.FournisseurRepository;
 import biz.picosoft.demo.service.FournisseurQueryService;
 import biz.picosoft.demo.service.FournisseurService;
-import biz.picosoft.demo.service.criteria.DemandeAchatCriteria;
 import biz.picosoft.demo.service.criteria.FournisseurCriteria;
-import biz.picosoft.demo.service.dto.DemandeAchatDTO;
-import biz.picosoft.demo.service.dto.DemandeDevisDTO;
-import biz.picosoft.demo.service.dto.FournisseurDTO;
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import biz.picosoft.demo.service.dto.FournisseurDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -199,9 +195,14 @@ public class FournisseurResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
-
-    @GetMapping("/fournisseurs/produit/{id}")
-    public List<Produit> getProduitsByFournisseur(@PathVariable Long id) {
-        return fournisseurService.getProduitsByFournisseur(id);
+    @GetMapping("/all")
+    public ResponseEntity<List<Fournisseur>> getAllFournisseaursSimple() {
+        List<Fournisseur> list = fournisseurService.getAll();
+        return ResponseEntity.ok().body(list);
     }
+    @GetMapping("/fournisseur/name/{id}")
+    public String getFournisseurName(@PathVariable Long id) {
+        return fournisseurService.geFournisseurName(id);
+    }
+
 }

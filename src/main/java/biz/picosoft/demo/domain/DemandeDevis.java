@@ -1,21 +1,18 @@
 package biz.picosoft.demo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
 import javax.persistence.*;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * A DemandeDevis.
  */
 @Entity
 @Table(name = "demande_devis", schema = "achat")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class DemandeDevis implements Serializable {
 
@@ -30,62 +27,28 @@ public class DemandeDevis implements Serializable {
     @Column(name = "description")
     private String description;
 
-    public LocalDate getDatedemande() {
-        return datedemande;
-    }
-
-    public void setDatedemande(LocalDate datedemande) {
-        this.datedemande = datedemande;
-    }
-
     @Column(name = "datedemande")
     private LocalDate datedemande;
-
-    @Column(name = "quantite")
-    private Long quantite;
-
-    public String getNom() {
-            return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
 
     @Column(name = "nom")
     private String nom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "offres", "demandedevis", "produit" }, allowSetters = true)
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    @Column(name = "reference")
+    private String reference;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     private Fournisseur fournisseur;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "offres", "demandedevis" }, allowSetters = true)
     private DemandeAchat demandeAchat;
-
-    public Offre getOffre() {
-        return offre;
-    }
-
-    public void setOffre(Offre offre) {
-        this.offre = offre;
-    }
-
-    @OneToOne(mappedBy = "demandeDevis", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-    @JsonIgnoreProperties(value = { "demandeDevis" }, allowSetters = true)
-    private Offre offre;
-
-    public Set<ProduitDemandee> getProduitsDemandes() {
-        return produitDemandees;
-    }
-
-    public void setProduitsDemandes(Set<ProduitDemandee> produitDemandees) {
-        this.produitDemandees = produitDemandees;
-    }
-
-    @OneToMany(mappedBy = "demandeDevis", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties(value = { "demandeDevis" }, allowSetters = true)
-    private Set<ProduitDemandee> produitDemandees = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -115,20 +78,31 @@ public class DemandeDevis implements Serializable {
         this.description = description;
     }
 
-    public Long getQuantite() {
-        return this.quantite;
+    public LocalDate getDatedemande() {
+        return this.datedemande;
     }
 
-    public DemandeDevis quantite(Long quantite) {
-        this.setQuantite(quantite);
+    public DemandeDevis datedemande(LocalDate datedemande) {
+        this.setDatedemande(datedemande);
         return this;
     }
 
-    public void setQuantite(Long quantite) {
-        this.quantite = quantite;
+    public void setDatedemande(LocalDate datedemande) {
+        this.datedemande = datedemande;
     }
 
+    public String getNom() {
+        return this.nom;
+    }
 
+    public DemandeDevis nom(String nom) {
+        this.setNom(nom);
+        return this;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
 
     public Fournisseur getFournisseur() {
         return this.fournisseur;
@@ -155,22 +129,6 @@ public class DemandeDevis implements Serializable {
         this.setDemandeAchat(demandeAchat);
         return this;
     }
-    public DemandeDevis produitsDemandees(Set<ProduitDemandee> produitDemandees) {
-        this.setProduitsDemandes(produitDemandees);
-        return this;
-    }
-
-    public DemandeDevis addProduitDemandee(ProduitDemandee produitDemandee) {
-        this.produitDemandees.add(produitDemandee);
-        produitDemandee.setDemandeDevis(this);
-        return this;
-    }
-
-    public DemandeDevis removeProduitDemandee(ProduitDemandee produitDemandee) {
-        this.produitDemandees.remove(produitDemandee);
-        produitDemandee.setDemandeDevis(null);
-        return this;
-    }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
@@ -195,9 +153,10 @@ public class DemandeDevis implements Serializable {
     @Override
     public String toString() {
         return "DemandeDevis{" +
-                "id=" + getId() +
-                ", description='" + getDescription() + "'" +
-                ", quantite=" + getQuantite() +
-                "}";
+            "id=" + getId() +
+            ", description='" + getDescription() + "'" +
+            ", datedemande='" + getDatedemande() + "'" +
+            ", nom='" + getNom() + "'" +
+            "}";
     }
 }

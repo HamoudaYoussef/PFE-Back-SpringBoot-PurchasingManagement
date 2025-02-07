@@ -1,11 +1,10 @@
 package biz.picosoft.demo.controller;
 
 import biz.picosoft.demo.domain.DemandeDevis;
-import biz.picosoft.demo.domain.Offre;
+import biz.picosoft.demo.domain.Fournisseur;
 import biz.picosoft.demo.repository.DemandeDevisRepository;
 import biz.picosoft.demo.service.DemandeDevisQueryService;
 import biz.picosoft.demo.service.DemandeDevisService;
-import biz.picosoft.demo.service.criteria.DemandeAchatCriteria;
 import biz.picosoft.demo.service.criteria.DemandeDevisCriteria;
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 
@@ -15,14 +14,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import biz.picosoft.demo.service.dto.DemandeAchatDTO;
 import biz.picosoft.demo.service.dto.DemandeDevisDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,6 +66,7 @@ public class DemandeDevisResource {
     @PostMapping("")
     public ResponseEntity<DemandeDevisDTO> createDemandeDevis(@RequestBody DemandeDevisDTO demandeDevisDTO) throws URISyntaxException {
         log.debug("REST request to save DemandeDevis : {}", demandeDevisDTO);
+
         if (demandeDevisDTO.getId() != null) {
             throw new BadRequestAlertException("A new demandeDevis cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -79,6 +76,7 @@ public class DemandeDevisResource {
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
+
     @PostMapping("/without")
     public ResponseEntity<DemandeDevisDTO> createDemandeDevisWithoutDemandeAchat(@RequestBody DemandeDevisDTO demandeDevisDTO) throws URISyntaxException {
         log.debug("REST request to save DemandeDevis : {}", demandeDevisDTO);
@@ -234,5 +232,41 @@ public class DemandeDevisResource {
     public String getFournisseurName(@PathVariable Long id) {
         DemandeDevis demandeDevis = demandeDevisRepository.findById(id).orElseThrow();
         return demandeDevis.getFournisseur().getNom();
+    }
+    @GetMapping("/demande-devis/by-demande-achat/{demandeAchatId}")
+    public ResponseEntity<List<DemandeDevis>> getDemandesDevisByDemandeAchatId(@PathVariable Long demandeAchatId) {
+        List<DemandeDevis> demandesDevis = demandeDevisService.getDemandesDevisByDemandeAchatId(demandeAchatId);
+
+        // On vérifie si la liste est vide pour renvoyer une réponse appropriée
+        if (demandesDevis.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(demandesDevis);
+        }
+    }
+
+    @GetMapping("/fournisseur/{demandeDevisId}")
+    public ResponseEntity<Fournisseur> getFournisseurByDemandeDevisId(@PathVariable Long demandeDevisId) {
+        Fournisseur fournisseur = demandeDevisService.getFournisseurByDemandeDevisId(demandeDevisId);
+        return ResponseEntity.ok(fournisseur);
+    }
+
+    @GetMapping("/generer-code")
+    public ResponseEntity<String> genererCodeDemandeDevis() {
+        String nouveauCode = demandeDevisService.genererCodeDemandeDevis();
+        return ResponseEntity.ok(nouveauCode);
+    }
+    @GetMapping("/getLast")
+    public ResponseEntity<DemandeDevis> getLatestDemandeDevis() {
+        Optional<DemandeDevis> demandeDevis = demandeDevisService.getLatestDemandeDevis();
+        return demandeDevis.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/byFournisseur/{fournisseurId}")
+    public List<DemandeDevis> getDemandeDevisByFournisseur(@PathVariable Long fournisseurId) {
+        Fournisseur fournisseur = new Fournisseur();
+        fournisseur.setId(fournisseurId); // Assuming you only have the ID
+        return demandeDevisService.getDemandeDevisByFournisseur(fournisseur);
     }
 }

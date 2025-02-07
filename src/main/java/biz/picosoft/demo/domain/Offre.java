@@ -1,20 +1,16 @@
 package biz.picosoft.demo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * not an ignored comment
+ * A Offre.
  */
 @Entity
 @Table(name = "offre", schema = "achat")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Offre implements Serializable {
 
@@ -26,16 +22,9 @@ public class Offre implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    public String getNom() {
-        return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
     @Column(name = "nom")
     private String nom;
+
     @Column(name = "prix")
     private Float prix;
 
@@ -48,51 +37,13 @@ public class Offre implements Serializable {
     @Column(name = "referenceoffre")
     private String referenceoffre;
 
-    public String getReferenceoffre() {
-        return referenceoffre;
-    }
-
-    public void setReferenceoffre(String referenceoffre) {
-        this.referenceoffre = referenceoffre;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offre")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "bonlivraisons", "factures", "offre", "demandedevis" }, allowSetters = true)
-    private Set<BonCommande> boncommandes = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "offres", "produits" }, allowSetters = true)
-    private DemandeAchat demandeachat;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "offres", "demandedevis", "produit" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "fournisseur_id")
     private Fournisseur fournisseur;
 
-    public DemandeDevis getDemandeDevis() {
-        return demandeDevis;
-    }
-
-    public void setDemandeDevis(DemandeDevis demandeDevis) {
-        this.demandeDevis = demandeDevis;
-    }
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(unique = true)
-    @JsonIgnoreProperties(value = { "offre" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "fournisseur", "demandeAchat" }, allowSetters = true)
     private DemandeDevis demandeDevis;
-    public Set<ProduitOffert> getProduitOfferts() {
-        return produitOfferts;
-    }
-
-    public void setProduitOfferts(Set<ProduitOffert> produitOfferts) {
-        this.produitOfferts = produitOfferts;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offre")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "fournisseur", "offre" }, allowSetters = true)
-    private Set<ProduitOffert>produitOfferts ;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -107,6 +58,19 @@ public class Offre implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getNom() {
+        return this.nom;
+    }
+
+    public Offre nom(String nom) {
+        this.setNom(nom);
+        return this;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
     public Float getPrix() {
@@ -148,48 +112,17 @@ public class Offre implements Serializable {
         this.description = description;
     }
 
-    public Set<BonCommande> getBoncommandes() {
-        return this.boncommandes;
+    public String getReferenceoffre() {
+        return this.referenceoffre;
     }
 
-    public void setBoncommandes(Set<BonCommande> bonCommandes) {
-        if (this.boncommandes != null) {
-            this.boncommandes.forEach(i -> i.setOffre(null));
-        }
-        if (bonCommandes != null) {
-            bonCommandes.forEach(i -> i.setOffre(this));
-        }
-        this.boncommandes = bonCommandes;
-    }
-
-    public Offre boncommandes(Set<BonCommande> bonCommandes) {
-        this.setBoncommandes(bonCommandes);
+    public Offre referenceoffre(String referenceoffre) {
+        this.setReferenceoffre(referenceoffre);
         return this;
     }
 
-    public Offre addBoncommande(BonCommande bonCommande) {
-        this.boncommandes.add(bonCommande);
-        bonCommande.setOffre(this);
-        return this;
-    }
-
-    public Offre removeBoncommande(BonCommande bonCommande) {
-        this.boncommandes.remove(bonCommande);
-        bonCommande.setOffre(null);
-        return this;
-    }
-
-    public DemandeAchat getDemandeachat() {
-        return this.demandeachat;
-    }
-
-    public void setDemandeachat(DemandeAchat demandeAchat) {
-        this.demandeachat = demandeAchat;
-    }
-
-    public Offre demandeachat(DemandeAchat demandeAchat) {
-        this.setDemandeachat(demandeAchat);
-        return this;
+    public void setReferenceoffre(String referenceoffre) {
+        this.referenceoffre = referenceoffre;
     }
 
     public Fournisseur getFournisseur() {
@@ -202,6 +135,19 @@ public class Offre implements Serializable {
 
     public Offre fournisseur(Fournisseur fournisseur) {
         this.setFournisseur(fournisseur);
+        return this;
+    }
+
+    public DemandeDevis getDemandeDevis() {
+        return this.demandeDevis;
+    }
+
+    public void setDemandeDevis(DemandeDevis demandeDevis) {
+        this.demandeDevis = demandeDevis;
+    }
+
+    public Offre demandeDevis(DemandeDevis demandeDevis) {
+        this.setDemandeDevis(demandeDevis);
         return this;
     }
 
@@ -229,9 +175,11 @@ public class Offre implements Serializable {
     public String toString() {
         return "Offre{" +
             "id=" + getId() +
+            ", nom='" + getNom() + "'" +
             ", prix=" + getPrix() +
             ", dateoffre='" + getDateoffre() + "'" +
             ", description='" + getDescription() + "'" +
+            ", referenceoffre='" + getReferenceoffre() + "'" +
             "}";
     }
 }

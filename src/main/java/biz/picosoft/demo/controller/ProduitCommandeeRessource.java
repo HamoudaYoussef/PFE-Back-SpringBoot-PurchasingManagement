@@ -1,11 +1,13 @@
 package biz.picosoft.demo.controller;
 
+import biz.picosoft.demo.domain.*;
+import biz.picosoft.demo.errors.ResourceNotFoundException;
+import biz.picosoft.demo.repository.OffreRepository;
+import biz.picosoft.demo.repository.ProduitCommandeeRepository;
 import biz.picosoft.demo.service.ProduitCommandeeQueryService;
 import biz.picosoft.demo.service.ProduitCommandeeService;
 import biz.picosoft.demo.service.criteria.ProduitCommandeeCriteria;
-import biz.picosoft.demo.service.criteria.ProduitDemandeeCriteria;
 import biz.picosoft.demo.service.dto.ProduitCommandeeDTO;
-import biz.picosoft.demo.service.dto.ProduitDemandeeDTO;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -16,10 +18,11 @@ import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
-import java.awt.print.Pageable;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,13 +38,21 @@ public class ProduitCommandeeRessource {
     private String applicationName;
 
     private final ProduitCommandeeService produitCommandeeService;
+
+    private final ProduitCommandeeRepository produitCommandeeRepository;
+    private final OffreRepository offreRepository;
+
     private final ProduitCommandeeQueryService produitCommandeeQueryService;
 
 
     public ProduitCommandeeRessource(ProduitCommandeeService produitCommandeeService,
-                                     ProduitCommandeeQueryService produitCommandeeQueryService) {
+                                     ProduitCommandeeQueryService produitCommandeeQueryService,
+                                     ProduitCommandeeRepository produitCommandeeRepository,
+                                     OffreRepository offreRepository) {
         this.produitCommandeeService = produitCommandeeService;
         this.produitCommandeeQueryService = produitCommandeeQueryService;
+        this.produitCommandeeRepository = produitCommandeeRepository;
+        this.offreRepository = offreRepository;
     }
 
     /**
@@ -125,5 +136,35 @@ public class ProduitCommandeeRessource {
         log.debug("REST request to delete ProduitCommandee : {}", id);
         produitCommandeeService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString())).build();
+    }
+    @GetMapping("/produit-commandees/{id}/produits")
+    public List<ProduitCommandee> getProduitCommandeByDemandeDevisId(@PathVariable Long id) {
+        return produitCommandeeService.getProduitCommandeByDemandeDevisId(id);
+    }
+
+    @GetMapping("/produit-commandees/{id}/demande-devis")
+    public ResponseEntity<DemandeDevis> getDemandeDevisByProduitCommandee(@PathVariable Long id) {
+        DemandeDevis demandeDevis = produitCommandeeService.getDemandeDevisByProduitCommandee(id);
+        return ResponseEntity.ok(demandeDevis);
+    }
+
+    @GetMapping("/produit-commandees/{offreId}/{produitId}")
+    public List<ProduitCommandee> getProduitsCommandesByOffreAndProduit(
+            @PathVariable Long offreId, @PathVariable Long produitId) {
+
+        // Charger l'offre
+        Offre offre = offreRepository.findById(offreId)
+                .orElseThrow(() -> new ResourceNotFoundException("Offre not found"));
+
+        // Récupérer la demande de devis associée à cette offre
+        DemandeDevis demandeDevis = offre.getDemandeDevis();
+
+        // Si aucune demande de devis n'est associée
+        if (demandeDevis == null) {
+            return Collections.emptyList();
+        }
+
+        // Rechercher les produits commandés par demande de devis et produit spécifiques
+        return produitCommandeeRepository.findByDemandeDevis_IdAndAndProduit_Id(demandeDevis.getId(), produitId);
     }
 }

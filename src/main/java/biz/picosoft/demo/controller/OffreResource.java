@@ -1,15 +1,11 @@
 package biz.picosoft.demo.controller;
 
-import biz.picosoft.demo.domain.DemandeAchat;
 import biz.picosoft.demo.domain.Fournisseur;
 import biz.picosoft.demo.domain.Offre;
 import biz.picosoft.demo.repository.OffreRepository;
 import biz.picosoft.demo.service.OffreQueryService;
 import biz.picosoft.demo.service.OffreService;
-import biz.picosoft.demo.service.criteria.DemandeDevisCriteria;
 import biz.picosoft.demo.service.criteria.OffreCriteria;
-import biz.picosoft.demo.service.dto.DemandeDevisDTO;
-import biz.picosoft.demo.service.dto.OffreDTO;
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,14 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import biz.picosoft.demo.service.dto.OffreDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -238,23 +233,21 @@ public class OffreResource {
         return offreService.findOffresByFournisseur(fournisseurId);
     }
 
-    @GetMapping("/demandeachat/{demandeachatId}")
-    public List<Offre> getOffresByDemandeAchat(@PathVariable Long demandeachatId) {
-        return offreService.findOffresByDemandeAchat(demandeachatId);
-    }
-    @GetMapping("/offres-par-fournisseur")
-    public Map<Fournisseur, List<Offre>> getOffresParFournisseur() {
-        return offreService.getOffresTriesParFournisseur();
-    }
-    @GetMapping("/offres-par-demandeachat")
-    public Map<DemandeAchat, List<Offre>> getOffresParDemandeAchat() {
-        return offreService.getOffresTriesParDemandeAchat();
+    @GetMapping("/getByDemandeDevis/{id}")
+    public Offre getOffresByDemandeDevis(@PathVariable Long id) {
+        return offreService.findOffreByDemandeDevis(id);
     }
 
     @GetMapping("/{id}/fournisseur-name")
     public String getFournisseurName(@PathVariable Long id) {
         Offre offre = offreRepository.findById(id).orElseThrow();
         return offre.getFournisseur().getNom();
+    }
+
+    @GetMapping("/{offreId}/fournisseur")
+    public ResponseEntity<Fournisseur> getFournisseurByOffreId(@PathVariable Long offreId) {
+        Fournisseur fournisseur = offreService.getFournisseurByOffreId(offreId);
+        return ResponseEntity.ok().body(fournisseur);
     }
     /*@PostMapping("/affecter")
     public ResponseEntity<Offre> affecterOffre(@RequestBody Offre offreRequest) {

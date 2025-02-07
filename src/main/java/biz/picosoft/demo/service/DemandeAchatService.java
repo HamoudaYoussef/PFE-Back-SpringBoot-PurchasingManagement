@@ -40,7 +40,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import biz.picosoft.demo.service.mapper.DemandeAchatOutputMapper;
-import biz.picosoft.demo.service.mapper.DemandeAchatOutputMapperImpl;
 import freemarker.template.TemplateException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -81,7 +80,7 @@ public class DemandeAchatService {
     private final KernelInterface kernelInterface;
 
 
-    public DemandeAchatService(DemandeAchatOutputMapperImpl demandeAchatOutputMapper,CurrentUser currentUser,
+    public DemandeAchatService(DemandeAchatOutputMapper demandeAchatOutputMapper,CurrentUser currentUser,
                                DemandeAchatRepository demandeAchatRepository,WorkflowService workflowService,KernelInterface kernelInterface,
                                KernelService kernelService, DemandeAchatMapper demandeAchatMapper,
                                DemandeAchatInputMapper demandeAchatInputMapper,DemandeDevisRepository demandeDevisRepository,
@@ -95,8 +94,8 @@ public class DemandeAchatService {
         this.workflowService = workflowService;
         this.demandeAchatInputMapper = demandeAchatInputMapper;
         this.produitDemandeeRepository = produitDemandeeRepository;
-this.offreRepository = offreRepository;
-this.demandeDevisRepository = demandeDevisRepository;
+        this.offreRepository = offreRepository;
+        this.demandeDevisRepository = demandeDevisRepository;
     }
 
     /**
@@ -135,14 +134,14 @@ this.demandeDevisRepository = demandeDevisRepository;
         log.debug("Request to partially update DemandeAchat : {}", demandeAchatDTO);
 
         return demandeAchatRepository
-            .findById(demandeAchatDTO.getId())
-            .map(existingDemandeAchat -> {
-                demandeAchatMapper.partialUpdate(existingDemandeAchat, demandeAchatDTO);
+                .findById(demandeAchatDTO.getId())
+                .map(existingDemandeAchat -> {
+                    demandeAchatMapper.partialUpdate(existingDemandeAchat, demandeAchatDTO);
 
-                return existingDemandeAchat;
-            })
-            .map(demandeAchatRepository::save)
-            .map(demandeAchatMapper::toDto);
+                    return existingDemandeAchat;
+                })
+                .map(demandeAchatRepository::save)
+                .map(demandeAchatMapper::toDto);
     }
 
     /**
@@ -156,6 +155,11 @@ this.demandeDevisRepository = demandeDevisRepository;
         log.debug("Request to get all DemandeAchats");
         return demandeAchatRepository.findAll(pageable).map(demandeAchatMapper::toDto);
     }
+
+    public List<DemandeAchat> getAll() {
+        return demandeAchatRepository.findAll();
+    }
+
 
     /**
      * Get one demandeAchat by id.
@@ -175,28 +179,8 @@ this.demandeDevisRepository = demandeDevisRepository;
      * @param id the id of the entity.
      */
     public void delete(Long id) {
-        DemandeAchat demandeAchat = demandeAchatRepository.findById(id).orElse(null);
-        if (demandeAchat != null) {
-            // Supprimer les offres associées
-            for (Offre offre : demandeAchat.getOffres()) {
-                offre.setDemandeachat(null);  // Déassocier l'offre
-                offreRepository.delete(offre);
-            }
-
-            // Supprimer les demandes de devis associées
-            for (DemandeDevis demandeDevis : demandeAchat.getDemandeDevis()) {
-                demandeDevis.setDemandeAchat(null);  // Déassocier la demande de devis
-                demandeDevisRepository.delete(demandeDevis);
-            }
-            List<ProduitDemandee> produitsDemandes = produitDemandeeRepository.findByDemandeAchatId(demandeAchat.getId());
-            for (ProduitDemandee produitDemandee : produitsDemandes) {
-                produitDemandee.setDemandeAchat(null);  // Déassociation
-                produitDemandeeRepository.delete(produitDemandee);  // Optionnel : Suppression si souhaité
-            }
-
-            // Supprimer la demande d'achat
-            demandeAchatRepository.delete(demandeAchat);
-        }
+        log.debug("Request to delete DemandeAchat : {}", id);
+        demandeAchatRepository.deleteById(id);
     }
 
 
@@ -217,20 +201,23 @@ this.demandeDevisRepository = demandeDevisRepository;
                     RCErrors.ERR_Key_not_authorized);
         return true;
     }
- 
+
     public void updateStatut(long id, StatutDA statutDA) {
         DemandeAchat demandeAchat = demandeAchatRepository.findById(id).get();
         demandeAchat.setStatut(statutDA.termine);
+        demandeAchat.setDescription(demandeAchat.getDescription());
         demandeAchatRepository.save(demandeAchat);
     }
     public void statutEnAttente(long id, StatutDA statutDA) {
         DemandeAchat demandeAchat = demandeAchatRepository.findById(id).get();
         demandeAchat.setStatut(statutDA.en_attente);
+        demandeAchat.setDescription(demandeAchat.getDescription());
         demandeAchatRepository.save(demandeAchat);
     }
     public void updateStatutAnnuler(long id, StatutDA statutDA) {
         DemandeAchat demandeAchat = demandeAchatRepository.findById(id).get();
         demandeAchat.setStatut(statutDA.Rejetee);
+        demandeAchat.setDescription(demandeAchat.getDescription());
         demandeAchatRepository.save(demandeAchat);
     }
 
@@ -326,6 +313,7 @@ this.demandeDevisRepository = demandeDevisRepository;
                     wfdtoWithOutDecision.setDecisionsWF(new ArrayList<>());
                     demandeOutputDTO.setWorkflow(wfdtoWithOutDecision);
                     demandeOutputDTO.setWfProcessName(demandeOutputDTO.getWorkflow().getWfProcessName());
+
 
                 }
             }
@@ -516,15 +504,15 @@ this.demandeDevisRepository = demandeDevisRepository;
     public DemandeAchatOutputDTO submitProcessDemandeAchat(DemandeAchatInputDTO demandeInputDTO, AclClass aclClass) throws Exception {
 
         entityManager.clear();
-        // extract object by id from data base
+        // extract object by id from database
         Optional<DemandeAchat> demandeOptional = demandeAchatRepository.findById(demandeInputDTO.getId());
 
-        // extract courrier
-        DemandeAchat requestCase = demandeOptional.get();
-
-        // check if the object exist in database
+        // check if the object exists in the database
         if (!demandeOptional.isPresent())
             throw new BadRequestAlertException(RCErrors.ERR_Msg_requestCase_null, RCErrors.Entity_requestCase, RCErrors.ERR_Key_requestCase_null);
+
+        // extract DemandeAchat entity
+        DemandeAchat requestCase = demandeOptional.get();
 
         // extract permission of the authentifier from kernel
         String permission = kernelService.checkSecurity(aclClass.getSimpleName(), demandeInputDTO.getId(), currentUser.getSid());
@@ -533,26 +521,23 @@ this.demandeDevisRepository = demandeDevisRepository;
         if (!permission.equals(Permission.WRITE.name()) && !permission.equals(Permission.INH_WRITE.name()))
             throw new BadRequestAlertException(RCErrors.ERR_Msg_not_authorized, RCErrors.Entity_requestCase, RCErrors.ERR_Key_not_authorized);
 
-        // validate attributes courrier
+        // validate attributes
         this.validateRequestCase(aclClass, demandeInputDTO);
 
-        // extract activity name from courrier
+        // extract activity name from the DemandeAchat
         String activityName = requestCase.getActivityName();
 
-        // fusion the input object and the object from database
+        // merge the input data into the entity
         demandeAchatInputMapper.partialUpdate(requestCase, demandeInputDTO);
 
-        // map object courrier to courrier by id DTO
+        // Set the description from the updated entity
+
+        // map the entity to output DTO
         DemandeAchatOutputDTO requestCaseOutputDTO = demandeAchatOutputMapper.toDto(requestCase);
-
         requestCaseOutputDTO.setClassId(aclClass.getId());
-
         requestCaseOutputDTO.setClassName(aclClass.getClasse());
-
         requestCaseOutputDTO.setLabelClass(aclClass.getLabel());
-
         requestCaseOutputDTO.setSimpleClassName(aclClass.getSimpleName());
-
 
         // initialize workflow information
         WFDTO workflow = new WFDTO();
@@ -563,25 +548,19 @@ this.demandeDevisRepository = demandeDevisRepository;
         BpmJob bpmJob = workflowService._nextTaskWithoutEvent(requestCase.getWfProcessID(), demandeInputDTO.getDecision(), demandeInputDTO.getWfComment(), requestCaseOutputDTO, aclClass);
 
         List<String> authors = bpmJob.getAuthors();
-
         List<String> readers = bpmJob.getReaders();
 
         requestCaseOutputDTO = (DemandeAchatOutputDTO) bpmJob.getDataObject();
-
         requestCase = demandeAchatOutputMapper.toEntity(requestCaseOutputDTO);
-
         requestCase.setWfProcessID(bpmJob.getProcessID());
-
         requestCase.setActivityName(bpmJob.getActivityName());
-
         requestCase.setEndProcess(bpmJob.getEndProcess());
-
         requestCase.setAssignee(bpmJob.getAssignee() != null ? bpmJob.getAssignee() : null);
+        requestCase.setDescription(demandeInputDTO.getDescription());
 
         requestCase = saveDemande(requestCase, authors, readers, aclClass, false);
 
         return demandeAchatOutputMapper.toDto(requestCase);
-
     }
     public Boolean validateRequestCase(AclClass aclClass, DemandeAchatInputDTO demandeInputDTO) {
 

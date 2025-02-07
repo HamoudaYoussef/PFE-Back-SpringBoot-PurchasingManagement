@@ -22,7 +22,6 @@ import java.util.Optional;
 
 import biz.picosoft.demo.service.dto.DemandeAchatInputDTO;
 import biz.picosoft.demo.service.dto.DemandeAchatOutputDTO;
-import biz.picosoft.demo.service.dto.PaiementDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
@@ -341,5 +340,11 @@ public class DemandeAchatResource {
         DemandeAchatOutputDTO result = demandeAchatService.submitProcessDemandeAchat(requestCaseInputDTO, aclClass);
 
         return result;
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<DemandeAchat>> getAllDemandesAchat() {
+        List<DemandeAchat> list = demandeAchatService.getAll();
+        return ResponseEntity.ok().body(list);
     }
 }

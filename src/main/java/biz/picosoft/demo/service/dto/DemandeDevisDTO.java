@@ -3,9 +3,10 @@ package biz.picosoft.demo.service.dto;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Set;
 
-
+/**
+ * A DTO for the {@link biz.picosoft.demo.domain.DemandeDevis} entity.
+ */
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class DemandeDevisDTO implements Serializable {
 
@@ -13,70 +14,41 @@ public class DemandeDevisDTO implements Serializable {
 
     private String description;
 
-    private Long quantite;
-
-    public String getNom() {
-        return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
+    private LocalDate datedemande;
 
     private String nom;
 
-    public Long getOffreId() {
-        return offreId;
+    public String getReference() {
+        return reference;
     }
 
-    public void setOffreId(Long offreId) {
-        this.offreId = offreId;
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 
-    private Long offreId;  // Pour lier la demande de devis à une offre
+    private String reference;
 
 
-    public LocalDate getDatedemande() {
-        return datedemande;
+    private FournisseurDTO fournisseur;
+
+    public FournisseurDTO getFournisseur() {
+        return fournisseur;
     }
 
-    public void setDatedemande(LocalDate datedemande) {
-        this.datedemande = datedemande;
+    public void setFournisseur(FournisseurDTO fournisseur) {
+        this.fournisseur = fournisseur;
     }
 
-    private LocalDate datedemande;
 
-
-    public Long getFournisseurId() {
-        return fournisseurId;
+    public DemandeAchatDTO getDemandeAchat() {
+        return demandeAchat;
     }
 
-    public void setFournisseurId(Long fournisseurId) {
-        this.fournisseurId = fournisseurId;
+    public void setDemandeAchat(DemandeAchatDTO demandeAchat) {
+        this.demandeAchat = demandeAchat;
     }
 
-    public Long getDemandeAchatId() {
-        return demandeAchatId;
-    }
-
-    public void setDemandeAchatId(Long demandeAchatId) {
-        this.demandeAchatId = demandeAchatId;
-    }
-
-    private Long fournisseurId;
-
-    private Long demandeAchatId;
-
-    public Set<ProduitDemandeeDTO> getProduitDemandees() {
-        return produitDemandees;
-    }
-
-    public void setProduitDemandees(Set<ProduitDemandeeDTO> produitDemandees) {
-        this.produitDemandees = produitDemandees;
-    }
-
-    private Set<ProduitDemandeeDTO> produitDemandees;
-
+    private DemandeAchatDTO demandeAchat;
 
     public Long getId() {
         return id;
@@ -94,16 +66,21 @@ public class DemandeDevisDTO implements Serializable {
         this.description = description;
     }
 
-    public Long getQuantite() {
-        return quantite;
+    public LocalDate getDatedemande() {
+        return datedemande;
     }
 
-    public void setQuantite(Long quantite) {
-        this.quantite = quantite;
+    public void setDatedemande(LocalDate datedemande) {
+        this.datedemande = datedemande;
     }
 
+    public String getNom() {
+        return nom;
+    }
 
-
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -132,7 +109,8 @@ public class DemandeDevisDTO implements Serializable {
         return "DemandeDevisDTO{" +
             "id=" + getId() +
             ", description='" + getDescription() + "'" +
-            ", quantite=" + getQuantite() +
+            ", datedemande='" + getDatedemande() + "'" +
+            ", nom='" + getNom() + "'" +
             "}";
     }
 }

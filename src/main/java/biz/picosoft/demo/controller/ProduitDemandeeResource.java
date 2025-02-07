@@ -2,22 +2,20 @@ package biz.picosoft.demo.controller;
 
 
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
-import biz.picosoft.demo.domain.DemandeAchat;
-import biz.picosoft.demo.domain.Produit;
-import biz.picosoft.demo.domain.ProduitDemandee;
+import biz.picosoft.demo.domain.*;
+import biz.picosoft.demo.errors.ResourceNotFoundException;
+import biz.picosoft.demo.repository.DemandeDevisRepository;
 import biz.picosoft.demo.repository.ProduitDemandeeRepository;
 import biz.picosoft.demo.service.ProduitDemandeeQueryService;
 import biz.picosoft.demo.service.ProduitDemandeeService;
-import biz.picosoft.demo.service.criteria.ProduitCriteria;
 import biz.picosoft.demo.service.criteria.ProduitDemandeeCriteria;
 import biz.picosoft.demo.service.dto.DemandeAchatDTO;
-import biz.picosoft.demo.service.dto.ProduitDTO;
 import biz.picosoft.demo.service.dto.ProduitDemandeeDTO;
+import biz.picosoft.demo.service.dto.ProduitOffertDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +26,7 @@ import tech.jhipster.web.util.ResponseUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  */
@@ -52,14 +47,18 @@ public class ProduitDemandeeResource {
 
     private final ProduitDemandeeQueryService produitDemandeeQueryService;
 
+    private final DemandeDevisRepository demandeDevisRepository;
+
     public ProduitDemandeeResource(
         ProduitDemandeeService produitDemandeeService,
         ProduitDemandeeRepository produitDemandeeRepository,
-        ProduitDemandeeQueryService produitDemandeeQueryService
+        ProduitDemandeeQueryService produitDemandeeQueryService,
+        DemandeDevisRepository demandeDevisRepository
     ) {
         this.produitDemandeeService = produitDemandeeService;
         this.produitDemandeeRepository = produitDemandeeRepository;
         this.produitDemandeeQueryService = produitDemandeeQueryService;
+        this.demandeDevisRepository = demandeDevisRepository;
     }
 
     /**
@@ -69,12 +68,20 @@ public class ProduitDemandeeResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new produitDemandeeDTO, or with status {@code 400 (Bad Request)} if the produitDemandee has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/demande-achats/{demandeAchatId}/produits")
-    public ResponseEntity<ProduitDemandeeDTO> saveDemandeAchatWithProduits(
-            @PathVariable Long demandeAchatId,
-            @RequestBody ProduitDemandeeDTO produitDemandeeDTO) {
-        ProduitDemandeeDTO result = produitDemandeeService.save(demandeAchatId, produitDemandeeDTO);
-        return ResponseEntity.ok(result);
+
+
+    @PostMapping("")
+    public ResponseEntity<ProduitDemandeeDTO> createProduitDemandee(@RequestBody ProduitDemandeeDTO produitDemandeeDTO) throws URISyntaxException {
+        log.debug("REST request to save ProduitDemandee : {}", produitDemandeeDTO);
+        if (produitDemandeeDTO.getId() != null) {
+            throw new BadRequestAlertException("A new produitDemandee cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+
+        ProduitDemandeeDTO result = produitDemandeeService.save(produitDemandeeDTO);
+        return ResponseEntity
+                .created(new URI("/api/produit-demandees/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                .body(result);
     }
 
 
@@ -207,14 +214,22 @@ public class ProduitDemandeeResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
-    @GetMapping("/{id}/produits")
-    public List<ProduitDemandee> getProduitDemandeByDemandeAchatId(@PathVariable Long id) {
-        return produitDemandeeService.getProduitDemandeByDemandeAchatId(id);
+
+    @GetMapping("/{id}/demande-achat")
+    public ResponseEntity<DemandeAchat> getDemandeAchatByProduitDemandee(@PathVariable Long id) {
+        DemandeAchat demandeAchat = produitDemandeeService.getDemandeAchatByProduitDemandee(id);
+        return ResponseEntity.ok(demandeAchat);
     }
-    @GetMapping("/byDemandeDevis/{id}")
+    @GetMapping("/{id}/produits")
+    public ResponseEntity<List<ProduitDemandee>> getProduitDemandeByDemandeAchatId(@PathVariable Long id) {
+        List<ProduitDemandee> produitsDemandes = produitDemandeeService.getProduitDemandeByDemandeAchatId(id);
+        return ResponseEntity.ok(produitsDemandes);
+    }
+  
+  /*  @GetMapping("/byDemandeDevis/{id}")
     public List<ProduitDemandee> getProduitDemandeByDemandeDevis(@PathVariable Long id) {
         return produitDemandeeService.getProduitDemandeByDemandeDevisId(id);
-    }
+    }*/
     @GetMapping("/produits/grouped")
     public ResponseEntity<Map<DemandeAchat, List<ProduitDemandee>>> getProduitsGroupedByDemandeAchat() {
         Map<DemandeAchat, List<ProduitDemandee>> groupedProduits = produitDemandeeService.getProduitsGroupedByDemandeAchat();
@@ -225,4 +240,36 @@ public class ProduitDemandeeResource {
     public List<ProduitDemandee> getRecentProduitDemandee() {
         return produitDemandeeService.getRecentProduitDemandee();
     }
+
+    @GetMapping("/produit-commandee/by-produit-demandee/{produitDemandeeId}/demande-achat/{demandeAchatId}")
+    public ResponseEntity<List<ProduitCommandee>> getProduitCommandeesByProduitDemandeeAndDemandeAchat(
+            @PathVariable Long produitDemandeeId,
+            @PathVariable Long demandeAchatId) {
+        List<ProduitCommandee> produitCommandees = produitDemandeeService.findProduitCommandeesByProduitDemandeeAndDemandeAchat(produitDemandeeId, demandeAchatId);
+        return ResponseEntity.ok(produitCommandees);
+    }
+
+    @GetMapping("/{demandeDevisId}/{produitId}")
+    public List<ProduitDemandee> findProduitByDemandeAchat_IdAndProduit_Id(
+            @PathVariable Long demandeDevisId, @PathVariable Long produitId) {
+
+        // Charger l'offre
+        DemandeDevis demandeDevis = demandeDevisRepository.findById(demandeDevisId)
+                .orElseThrow(() -> new ResourceNotFoundException("Demande devis not found"));
+
+        // Récupérer la demande de devis associée à cette offre
+        DemandeAchat demandeAchat = demandeDevis.getDemandeAchat();
+
+        // Si aucune demande de devis n'est associée
+        if (demandeAchat == null) {
+            return Collections.emptyList();
+        }
+
+        // Rechercher les produits commandés par demande de devis et produit spécifiques
+        return produitDemandeeRepository.findByDemandeAchat_IdAndProduit_Id(demandeAchat.getId(), produitId);
+    }
+ /*   @GetMapping("/by-produit/{produitId}")
+    public List<ProduitDemandee> getProduitDemandeeByProduit(@PathVariable Long produitId) {
+        return produitDemandeeService.getProduitDemandeeByProduit(produitId);
+    }*/
 }

@@ -1,14 +1,14 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.domain.DemandeAchat_;
-import biz.picosoft.demo.domain.Fournisseur_;
 import biz.picosoft.demo.domain.Produit;
 import biz.picosoft.demo.domain.Produit_;
 import biz.picosoft.demo.repository.ProduitRepository;
 import biz.picosoft.demo.service.criteria.ProduitCriteria;
+
+import java.util.List;
+
 import biz.picosoft.demo.service.dto.ProduitDTO;
 import biz.picosoft.demo.service.mapper.ProduitMapper;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -17,8 +17,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
-
-import javax.persistence.criteria.JoinType;
 
 /**
  * Service for executing complex queries for {@link Produit} entities in the database.
@@ -42,7 +40,6 @@ public class ProduitQueryService extends QueryService<Produit> {
     }
 
     /**
-     * Return a {@link List} of {@link ProduitDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching entities.
      */
@@ -54,7 +51,6 @@ public class ProduitQueryService extends QueryService<Produit> {
     }
 
     /**
-     * Return a {@link Page} of {@link ProduitDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
      * @param page The page, which should be returned.
      * @return the matching entities.
@@ -102,9 +98,6 @@ public class ProduitQueryService extends QueryService<Produit> {
                 specification = specification.and(buildRangeSpecification(criteria.getQuantite(), Produit_.quantite));
             }
 
-            if (criteria.getCouleur() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getCouleur(), Produit_.couleur));
-            }
         }
 
         return specification;

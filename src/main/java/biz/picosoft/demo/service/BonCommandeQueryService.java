@@ -4,10 +4,11 @@ import biz.picosoft.demo.domain.*;
 import biz.picosoft.demo.repository.BonCommandeRepository;
 import biz.picosoft.demo.service.criteria.BonCommandeCriteria;
 import biz.picosoft.demo.service.dto.BonCommandeDTO;
-import biz.picosoft.demo.service.mapper.BonCommandeMapper;
 
 import javax.persistence.criteria.JoinType;
 import java.util.List;
+
+import biz.picosoft.demo.service.mapper.BonCommandeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -97,60 +98,16 @@ public class BonCommandeQueryService extends QueryService<BonCommande> {
             if (criteria.getReference() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getReference(), BonCommande_.reference));
             }
-            if (criteria.getNomentreprise() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getNomentreprise(), BonCommande_.nomentreprise));
-            }
-            if (criteria.getAdresseentreprise() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getAdresseentreprise(), BonCommande_.adresseentreprise));
-            }
+
             if (criteria.getDelailivraison() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getDelailivraison(), BonCommande_.delailivraison));
             }
-            if (criteria.getFraislivraison() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getFraislivraison(), BonCommande_.fraislivraison));
-            }
-            if (criteria.getMontanttotal() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getMontanttotal(), BonCommande_.montanttotal));
-            }
-            if (criteria.getTaxes() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getTaxes(), BonCommande_.taxes));
-            }
-            if (criteria.getSignature() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getSignature(), BonCommande_.signature));
-            }
-            if (criteria.getStatutbc() != null) {
-                specification = specification.and(buildSpecification(criteria.getStatutbc(), BonCommande_.statutbc));
-            }
+
+
             if (criteria.getTypeLivraison() != null) {
                 specification = specification.and(buildSpecification(criteria.getTypeLivraison(), BonCommande_.typelivraison));
             }
-            if (criteria.getInfoPaiement() != null) {
-                specification = specification.and(buildSpecification(criteria.getInfoPaiement(), BonCommande_.infopaiement));
-            }
-            if (criteria.getBonlivraisonId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(
-                            criteria.getBonlivraisonId(),
-                            root -> root.join(BonCommande_.bonlivraisons, JoinType.LEFT).get(BonLivraison_.id)
-                        )
-                    );
-            }
-            if (criteria.getFactureId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(
-                            criteria.getFactureId(),
-                            root -> root.join(BonCommande_.factures, JoinType.LEFT).get(Facture_.id)
-                        )
-                    );
-            }
-            if (criteria.getOffreId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(criteria.getOffreId(), root -> root.join(BonCommande_.offre, JoinType.LEFT).get(Offre_.id))
-                    );
-            }
+
 
         }
         return specification;

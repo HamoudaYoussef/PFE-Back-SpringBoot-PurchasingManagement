@@ -24,6 +24,16 @@ public class DemandeDevisCriteria implements Serializable, Criteria {
 
     private StringFilter description;
 
+    public StringFilter getReference() {
+        return reference;
+    }
+
+    public void setReference(StringFilter reference) {
+        this.reference = reference;
+    }
+
+    private StringFilter reference;
+
     private LongFilter quantite;
 
     public LocalDateFilter getDatedemande() {
@@ -66,6 +76,7 @@ public class DemandeDevisCriteria implements Serializable, Criteria {
         this.id = other.id == null ? null : other.id.copy();
         this.description = other.description == null ? null : other.description.copy();
         this.quantite = other.quantite == null ? null : other.quantite.copy();
+        this.reference = other.reference == null ? null : other.reference.copy();
         this.datedemande = other.datedemande == null ? null : other.datedemande.copy();
         this.nom = other.nom == null ? null : other.nom.copy();
         this.demandeAchatId = other.demandeAchatId == null ? null : other.demandeAchatId.copy();
@@ -164,6 +175,8 @@ public class DemandeDevisCriteria implements Serializable, Criteria {
             Objects.equals(description, that.description) &&
             Objects.equals(quantite, that.quantite) &&
             Objects.equals(nom, that.nom) &&
+                    Objects.equals(reference, that.reference ) &&
+
                     Objects.equals(datedemande, that.datedemande) &&
                     Objects.equals(demandeAchatId, that.demandeAchatId) &&
             Objects.equals(fournisseurId, that.fournisseurId) &&

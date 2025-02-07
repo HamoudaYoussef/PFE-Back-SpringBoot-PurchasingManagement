@@ -4,15 +4,10 @@ import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 import biz.picosoft.demo.domain.DemandeAchat;
 import biz.picosoft.demo.domain.DemandeDevis;
 import biz.picosoft.demo.domain.Fournisseur;
-import biz.picosoft.demo.domain.ProduitDemandee;
 import biz.picosoft.demo.repository.DemandeAchatRepository;
 import biz.picosoft.demo.repository.DemandeDevisRepository;
 import biz.picosoft.demo.repository.FournisseurRepository;
 import biz.picosoft.demo.repository.ProduitDemandeeRepository;
-import biz.picosoft.demo.service.dto.DemandeAchatDTO;
-import biz.picosoft.demo.service.dto.DemandeDevisDTO;
-import biz.picosoft.demo.service.dto.ProduitDemandeeDTO;
-import biz.picosoft.demo.service.mapper.DemandeDevisMapper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,12 +16,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import biz.picosoft.demo.service.dto.DemandeDevisDTO;
+import biz.picosoft.demo.service.mapper.DemandeDevisMapper;
 import biz.picosoft.demo.service.mapper.ProduitDemandeeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,15 +65,15 @@ public class DemandeDevisService {
         DemandeDevis demandeDevis = demandeDevisMapper.toEntity(demandeDevisDTO);
 
         // Associer le fournisseur s'il existe
-        if (demandeDevisDTO.getFournisseurId() != null) {
-            Fournisseur fournisseur = fournisseurRepository.findById(demandeDevisDTO.getFournisseurId())
+        if (demandeDevisDTO.getFournisseur().getId() != null) {
+            Fournisseur fournisseur = fournisseurRepository.findById(demandeDevisDTO.getFournisseur().getId())
                     .orElseThrow(() -> new BadRequestAlertException("Invalid Fournisseur ID", "demandeDevis", "idnotfound"));
             demandeDevis.setFournisseur(fournisseur);
         }
 
         // Associer la demande d'achat s'il existe
-        if (demandeDevisDTO.getDemandeAchatId() != null) {
-            DemandeAchat demandeAchat = demandeAchatRepository.findById(demandeDevisDTO.getDemandeAchatId())
+        if (demandeDevisDTO.getDemandeAchat().getId()!= null) {
+            DemandeAchat demandeAchat = demandeAchatRepository.findById(demandeDevisDTO.getDemandeAchat().getId())
                     .orElseThrow(() -> new BadRequestAlertException("Invalid DemandeAchat ID", "demandeDevis", "idnotfound"));
             demandeDevis.setDemandeAchat(demandeAchat);
         } else {
@@ -95,23 +91,53 @@ public class DemandeDevisService {
         demandeDevis = demandeDevisRepository.save(demandeDevis);
 
         // Récupérer les produits demandés via le service
-        List<ProduitDemandee> produitsDemandes = produitDemandeeRepository.findByDemandeAchatId(demandeDevisDTO.getDemandeAchatId());
+       /* List<ProduitDemandee> produitsDemandes = produitDemandeeRepository.findByDemandeAchatId(demandeDevisDTO.getDemandeAchatId());
 
         // Associer les produits demandés à la demande de devis et les sauvegarder
         for (ProduitDemandee produitDemandee : produitsDemandes) {
             produitDemandee.setDemandeDevis(demandeDevis);  // Associer à la demande de devis
             produitDemandeeRepository.save(produitDemandee);  // Sauvegarder les modifications
-        }
+        }*/
 
         return demandeDevisMapper.toDto(demandeDevis);
+    }
+
+    public String genererCodeDemandeDevis() {
+        // Récupérer la liste des DemandeDevis
+        List<DemandeDevis> demandeDevisList = demandeDevisRepository.findLatestDemandeDevis();
+
+        // Prendre le premier élément si disponible
+        Optional<DemandeDevis> dernierDemandeDevisOpt = demandeDevisList.stream().findFirst();
+
+        String nouveauCode;
+
+        if (dernierDemandeDevisOpt.isPresent()) {
+            // Récupérer la référence du dernier DemandeDevis
+            String dernierCode = dernierDemandeDevisOpt.get().getReference(); // Assurez-vous que getReference() est bien défini
+            int dernierNumero = Integer.parseInt(dernierCode.split("_")[1]); // Extraire le numéro après le "_"
+
+            // Générer le nouveau code en incrémentant le numéro
+            nouveauCode = "dd_" + String.format("%04d", dernierNumero + 1); // Incrémente et formate en 4 chiffres
+        } else {
+            // Si aucune demande de devis n'existe, initialiser le code
+            nouveauCode = "dd_0001"; // Code initial si aucun code n'existe
+        }
+
+        return nouveauCode;
+    }
+
+    public Optional<DemandeDevis> getLatestDemandeDevis() {
+        List<DemandeDevis> demandeDevisList = demandeDevisRepository.findLatestDemandeDevis();
+        return demandeDevisList.stream().findFirst();
+
     }
     public DemandeDevisDTO saveWithoutDemandeAchatId(DemandeDevisDTO demandeDevisDTO) {
         // Mapper le DTO vers une entité
         DemandeDevis demandeDevis = demandeDevisMapper.toEntity(demandeDevisDTO);
 
         // Associer le fournisseur s'il existe
-        if (demandeDevisDTO.getFournisseurId() != null) {
-            Fournisseur fournisseur = fournisseurRepository.findById(demandeDevisDTO.getFournisseurId())
+        if (demandeDevisDTO.getFournisseur().getId() != null) {
+            Fournisseur fournisseur = fournisseurRepository.findById(demandeDevisDTO.getFournisseur().getId())
                     .orElseThrow(() -> new BadRequestAlertException("Invalid Fournisseur ID", "demandeDevis", "idnotfound"));
             demandeDevis.setFournisseur(fournisseur);
         }
@@ -124,7 +150,7 @@ public class DemandeDevisService {
         demandeDevis = demandeDevisRepository.save(demandeDevis);
 
         // Récupérer les produits demandés depuis le DTO
-        Set<ProduitDemandeeDTO> produitsDemandesDTO = demandeDevisDTO.getProduitDemandees();
+   /*     Set<ProduitDemandeeDTO> produitsDemandesDTO = demandeDevisDTO.getProduitDemandees();
 
         if (produitsDemandesDTO != null && !produitsDemandesDTO.isEmpty()) {
             // Mapper chaque ProduitDemandeeDTO vers ProduitDemandee, les associer et les sauvegarder
@@ -133,7 +159,7 @@ public class DemandeDevisService {
                 produitDemandee.setDemandeDevis(demandeDevis);  // Associer chaque produit à la demande de devis
                 produitDemandeeRepository.save(produitDemandee);  // Sauvegarder le produit
             }
-        }
+        }*/
 
         // Retourner le DTO mis à jour après sauvegarde
         return demandeDevisMapper.toDto(demandeDevis);
@@ -145,14 +171,14 @@ public class DemandeDevisService {
         for (DemandeDevisDTO demandeDevisDTO : demandeDevisDTOList) {
             DemandeDevis demandeDevis = demandeDevisMapper.toEntity(demandeDevisDTO);
 
-            if (demandeDevisDTO.getFournisseurId() != null) {
-                Fournisseur fournisseur = fournisseurRepository.findById(demandeDevisDTO.getFournisseurId())
+            if (demandeDevisDTO.getFournisseur().getId() != null) {
+                Fournisseur fournisseur = fournisseurRepository.findById(demandeDevisDTO.getFournisseur().getId())
                         .orElseThrow(() -> new BadRequestAlertException("Invalid Fournisseur ID", "demandeDevis", "idnotfound"));
                 demandeDevis.setFournisseur(fournisseur);
             }
 
-            if (demandeDevisDTO.getDemandeAchatId() != null) {
-                DemandeAchat demandeAchat = demandeAchatRepository.findById(demandeDevisDTO.getDemandeAchatId())
+            if (demandeDevisDTO.getDemandeAchat().getId()!= null) {
+                DemandeAchat demandeAchat = demandeAchatRepository.findById(demandeDevisDTO.getDemandeAchat().getId())
                         .orElseThrow(() -> new BadRequestAlertException("Invalid DemandeAchat ID", "demandeDevis", "idnotfound"));
                 demandeDevis.setDemandeAchat(demandeAchat);
             }
@@ -235,5 +261,17 @@ public class DemandeDevisService {
     public void delete(Long id) {
         log.debug("Request to delete DemandeDevis : {}", id);
         demandeDevisRepository.deleteById(id);
+    }
+
+    public List<DemandeDevis> getDemandesDevisByDemandeAchatId(Long demandeAchatId) {
+        return demandeDevisRepository.findByDemandeAchat_Id(demandeAchatId);
+    }
+    @Transactional(readOnly = true)
+    public Fournisseur getFournisseurByDemandeDevisId(Long demandeDevisId) {
+        return demandeDevisRepository.findFournisseurByDemandeDevisId(demandeDevisId);
+    }
+
+    public List<DemandeDevis> getDemandeDevisByFournisseur(Fournisseur fournisseur) {
+        return demandeDevisRepository.findByFournisseur(fournisseur);
     }
 }

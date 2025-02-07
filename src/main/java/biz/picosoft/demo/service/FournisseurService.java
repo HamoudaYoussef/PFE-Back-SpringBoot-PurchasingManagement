@@ -1,28 +1,23 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.controller.errors.BadRequestAlertException;
 import biz.picosoft.demo.domain.DemandeDevis;
 import biz.picosoft.demo.domain.Fournisseur;
-import biz.picosoft.demo.domain.Produit;
+import biz.picosoft.demo.domain.Offre;
 import biz.picosoft.demo.errors.ResourceNotFoundException;
+import biz.picosoft.demo.repository.DemandeDevisRepository;
 import biz.picosoft.demo.repository.FournisseurRepository;
-import biz.picosoft.demo.service.dto.DemandeDevisDTO;
-import biz.picosoft.demo.service.dto.FournisseurDTO;
-import biz.picosoft.demo.service.mapper.FournisseurMapper;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import biz.picosoft.demo.service.dto.FournisseurDTO;
+import biz.picosoft.demo.service.mapper.FournisseurMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.hibernate.id.IdentifierGenerator.ENTITY_NAME;
 
 @Service
 @Transactional
@@ -31,6 +26,8 @@ public class FournisseurService {
     private final Logger log = LoggerFactory.getLogger(FournisseurService.class);
 
     private final FournisseurRepository fournisseurRepository;
+
+
 
     private final FournisseurMapper fournisseurMapper;
 
@@ -72,6 +69,9 @@ public class FournisseurService {
         }
         if (updatedFournisseur.getTel() != null) {
             fournisseur.setTel(updatedFournisseur.getTel());
+        }
+        if (updatedFournisseur.getEmail() != null) {
+            fournisseur.setEmail(updatedFournisseur.getEmail());
         }
 
         // Ajoutez d'autres attributs à mettre à jour ici, en vérifiant si les valeurs sont non nulles
@@ -134,7 +134,14 @@ public class FournisseurService {
         fournisseurRepository.deleteById(id);
     }
 
-    public List<Produit> getProduitsByFournisseur(Long fournisseurId) {
-        return fournisseurRepository.findProduitsByFournisseurId(fournisseurId);
+    public List<Fournisseur> getAll() {
+        return fournisseurRepository.findAll();
     }
+
+    public String geFournisseurName(Long fournisseurId) {
+        return fournisseurRepository.findFournisseurName(fournisseurId);
+    }
+
+
+
 }

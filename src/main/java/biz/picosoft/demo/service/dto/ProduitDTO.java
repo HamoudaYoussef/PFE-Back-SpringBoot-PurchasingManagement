@@ -1,18 +1,26 @@
 package biz.picosoft.demo.service.dto;
 
-import biz.picosoft.demo.domain.ennumeration.Categorie;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import biz.picosoft.demo.domain.Categorie;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.Objects;
 
+/**
+ * A DTO for the {@link biz.picosoft.demo.domain.Produit} entity.
+ */
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProduitDTO implements Serializable {
 
     private Long id;
+
     private String description;
+
     private String nom;
+
     private Long quantite;
+
+
+    private String img;
 
     public Categorie getCategorie() {
         return categorie;
@@ -24,27 +32,6 @@ public class ProduitDTO implements Serializable {
 
     private Categorie categorie;
 
-    private String couleur;
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
-    private String img;
-
-
-
-
-
-
-
-    private Set<FournisseurDTO> fournisseurs;
-
-    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -79,31 +66,46 @@ public class ProduitDTO implements Serializable {
     }
 
 
-    public String getCouleur() {
-        return couleur;
+
+    public String getImg() {
+        return img;
     }
 
-    public void setCouleur(String couleur) {
-        this.couleur = couleur;
-    }
-
-    public Set<FournisseurDTO> getFournisseurs() {
-        return fournisseurs;
-    }
-
-    public void setFournisseurs(Set<FournisseurDTO> fournisseurs) {
-        this.fournisseurs = fournisseurs;
+    public void setImg(String img) {
+        this.img = img;
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ProduitDTO)) {
+            return false;
+        }
+
+        ProduitDTO produitDTO = (ProduitDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, produitDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
     public String toString() {
         return "ProduitDTO{" +
-                "id=" + id +
-                ", description='" + description + '\'' +
-                ", nom='" + nom + '\'' +
-                ", quantite=" + quantite +
-                ", couleur='" + couleur + '\'' +
-                ", fournisseurs=" + fournisseurs +
-                '}';
+            "id=" + getId() +
+            ", description='" + getDescription() + "'" +
+            ", nom='" + getNom() + "'" +
+            ", quantite=" + getQuantite() +
+            ", categorie='" + getCategorie() + "'" +
+            ", img='" + getImg() + "'" +
+            "}";
     }
 }

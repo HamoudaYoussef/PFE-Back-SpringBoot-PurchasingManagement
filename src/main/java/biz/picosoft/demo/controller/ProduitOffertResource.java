@@ -2,17 +2,23 @@ package biz.picosoft.demo.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import biz.picosoft.demo.controller.errors.BadRequestAlertException;
+import biz.picosoft.demo.domain.*;
 import biz.picosoft.demo.repository.ProduitOffertRepository;
+import biz.picosoft.demo.service.ProduitOffertQueryService;
 import biz.picosoft.demo.service.ProduitOffertService;
+import biz.picosoft.demo.service.criteria.ProduitCommandeeCriteria;
+import biz.picosoft.demo.service.criteria.ProduitOffertCritereia;
+import biz.picosoft.demo.service.dto.ProduitCommandeeDTO;
 import biz.picosoft.demo.service.dto.ProduitOffertDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -40,9 +46,14 @@ public class ProduitOffertResource {
 
     private final ProduitOffertRepository produitOffertRepository;
 
-    public ProduitOffertResource(ProduitOffertService produitOffertService, ProduitOffertRepository produitOffertRepository) {
+    private  final ProduitOffertQueryService produitOffertQueryService ;
+
+    public ProduitOffertResource(ProduitOffertService produitOffertService,ProduitOffertQueryService produitOffertQueryService,
+                                 ProduitOffertRepository produitOffertRepository) {
         this.produitOffertService = produitOffertService;
         this.produitOffertRepository = produitOffertRepository;
+        this.produitOffertQueryService = produitOffertQueryService;
+
     }
 
     /**
@@ -57,11 +68,6 @@ public class ProduitOffertResource {
         log.debug("REST request to save ProduitOffert : {}", produitOffertDTO);
         if (produitOffertDTO.getId() != null) {
             throw new BadRequestAlertException("A new produitOffert cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-
-        // Affectez l'ID de l'offre
-        if (produitOffertDTO.getOffreId() == null) {
-            throw new BadRequestAlertException("L'ID de l'offre doit être fourni", ENTITY_NAME, "offreIdnull");
         }
 
         ProduitOffertDTO result = produitOffertService.save(produitOffertDTO);
@@ -104,6 +110,27 @@ public class ProduitOffertResource {
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, produitOffertDTO.getId().toString()))
             .body(result);
+    }
+
+
+    @PutMapping("/produits-offerts/{id}/{bonCommandeId}")
+    public ResponseEntity<ProduitOffert> updateProduitOffert(
+            @PathVariable Long id,
+             @RequestBody ProduitOffertDTO produitOffertDTO,
+            @PathVariable Long bonCommandeId) {  // Paramètre pour le bon de commande
+        ProduitOffert produitOffert = produitOffertService.updateProduitOffert(id, produitOffertDTO, bonCommandeId);
+        return ResponseEntity.ok(produitOffert);
+    }
+
+    @GetMapping(value = "/{id}/referenceoffre", produces = "text/plain")
+    public ResponseEntity<String> getReferenceOffre(@PathVariable Long id) {
+        String referenceOffre = produitOffertService.getReferenceOffre(id);
+        return ResponseEntity.ok(referenceOffre);
+    }
+    @GetMapping(value = "/{id}/dateOffre", produces = "text/plain")
+    public ResponseEntity<String> getDateeOffre(@PathVariable Long id) {
+        String dateOffre = produitOffertService.getDateOffre(id);
+        return ResponseEntity.ok(dateOffre);
     }
 
     /**
@@ -156,6 +183,20 @@ public class ProduitOffertResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @GetMapping("/produit-offerts-pagination")
+    public ResponseEntity<Page<ProduitOffertDTO>> getAllProduitOffertsPagination(
+            ProduitOffertCritereia criteria,
+            @org.springdoc.api.annotations.ParameterObject org.springframework.data.domain.Pageable pageable
+
+    ) {
+        log.debug("REST request to get all DemandeAchats by criteria: {}", criteria);
+        Page<ProduitOffertDTO> page = produitOffertQueryService.findByCriteria(criteria, pageable);
+
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page);
+
+    }
+
     /**
      * {@code GET  /produit-offerts/:id} : get the "id" produitOffert.
      *
@@ -189,5 +230,40 @@ public class ProduitOffertResource {
     public ResponseEntity<List<ProduitOffertDTO>> getProduitOffertsByOffreId(@PathVariable Long offreId) {
         List<ProduitOffertDTO> produitOfferts = produitOffertService.findByOffreId(offreId);
         return ResponseEntity.ok().body(produitOfferts);
+    }
+
+    @GetMapping("/produitOffert/{id}/bonCommande")
+    public ResponseEntity<BonCommande> getBonCommandeByProduitOffertId(@PathVariable("id") Long produitOffertId) {
+        BonCommande bonCommande = produitOffertService.getBonCommandeByProduitOffertId(produitOffertId);
+        if (bonCommande != null) {
+            return ResponseEntity.ok(bonCommande);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/produitsOfferts/{bonCommandeId}")
+    public ResponseEntity<List<ProduitOffertDTO>> getProduitOffertsByBonCommandeId(@PathVariable Long bonCommandeId) {
+        List<ProduitOffertDTO> produitsOfferts = produitOffertService.getProduitOffertsByBonCommande_Id(bonCommandeId);
+        return ResponseEntity.ok(produitsOfferts);
+    }
+
+    @GetMapping("/{id}/offre")
+    public ResponseEntity<Offre> getOffreByProduitOffert(@PathVariable Long id) {
+        Offre offre = produitOffertService.getOffreByProduitOffert(id);
+        return ResponseEntity.ok(offre);
+    }
+
+    @GetMapping("/produit-offert/by-produit-commandee/{produitCommandeeId}/demande-devis/{demandeDevisId}")
+    public ResponseEntity<List<ProduitOffert>> findProduitOffertByProduitCommandeeAndDemandeDevis(
+            @PathVariable Long produitCommandeeId,
+            @PathVariable Long demandeDevisId) {
+        List<ProduitOffert> produitCommandees = produitOffertService.findProduitOffertByProduitCommandeeAndDemandeDevis(produitCommandeeId, demandeDevisId);
+        return ResponseEntity.ok(produitCommandees);
+    }
+
+    @GetMapping("/groupedByBonCommande/{offreId}")
+    public ResponseEntity<Map<Long, List<ProduitOffert>>> getProduitsGroupedByBonCommande(@PathVariable Long offreId) {
+        Map<Long, List<ProduitOffert>> produitsGroupedByBonCommande = produitOffertService.getProduitsGroupedByBonCommande(offreId);
+        return ResponseEntity.ok(produitsGroupedByBonCommande);
     }
 }

@@ -3,9 +3,11 @@ package biz.picosoft.demo.service;
 import biz.picosoft.demo.domain.*;
 import biz.picosoft.demo.repository.FournisseurRepository;
 import biz.picosoft.demo.service.criteria.FournisseurCriteria;
+
+import java.util.List;
+
 import biz.picosoft.demo.service.dto.FournisseurDTO;
 import biz.picosoft.demo.service.mapper.FournisseurMapper;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -39,7 +41,6 @@ public class FournisseurQueryService extends QueryService<Fournisseur> {
     }
 
     /**
-     * Return a {@link List} of {@link FournisseurDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching entities.
      */
@@ -51,7 +52,6 @@ public class FournisseurQueryService extends QueryService<Fournisseur> {
     }
 
     /**
-     * Return a {@link Page} of {@link FournisseurDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
      * @param page The page, which should be returned.
      * @return the matching entities.
@@ -99,27 +99,7 @@ public class FournisseurQueryService extends QueryService<Fournisseur> {
             if (criteria.getTel() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getTel(), Fournisseur_.tel));
             }
-            if (criteria.getOffreId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(criteria.getOffreId(), root -> root.join(Fournisseur_.offres, JoinType.LEFT).get(Offre_.id))
-                    );
-            }
-            if (criteria.getDemandedevisId() != null) {
-                specification =
-                        specification.and(
-                                buildSpecification(
-                                        criteria.getDemandedevisId(),
-                                        root -> root.join(Fournisseur_ .demandedevis, JoinType.LEFT).get(DemandeDevis_.id)
-                                )
-                        );
-            }
-            if (criteria.getProduitId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(criteria.getProduitId(), root -> root.join(Fournisseur_.produit, JoinType.LEFT).get(Produit_.id))
-                    );
-            }
+
         }
         return specification;
     }

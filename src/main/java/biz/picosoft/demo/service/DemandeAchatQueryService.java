@@ -3,13 +3,13 @@ package biz.picosoft.demo.service;
 import biz.picosoft.demo.domain.DemandeAchat;
 import biz.picosoft.demo.domain.DemandeAchat_;
 import biz.picosoft.demo.domain.Offre_;
-import biz.picosoft.demo.domain.Produit_;
 import biz.picosoft.demo.repository.DemandeAchatRepository;
 import biz.picosoft.demo.service.criteria.DemandeAchatCriteria;
 import biz.picosoft.demo.service.dto.DemandeAchatDTO;
-import biz.picosoft.demo.service.mapper.DemandeAchatMapper;
 
 import java.util.List;
+
+import biz.picosoft.demo.service.mapper.DemandeAchatMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -102,12 +102,6 @@ public class DemandeAchatQueryService extends QueryService<DemandeAchat> {
             }
             if (criteria.getStatutDA() != null) {
                 specification = specification.and(buildSpecification(criteria.getStatutDA(), DemandeAchat_.statut));
-            }
-            if (criteria.getOffreId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(criteria.getOffreId(), root -> root.join(DemandeAchat_.offres, JoinType.LEFT).get(Offre_.id))
-                    );
             }
 
         }

@@ -14,13 +14,7 @@ public class ProduitOffertCritereia  implements Serializable, Criteria {
 
     private LongFilter id;
 
-    public LongFilter getFournisseurId() {
-        return fournisseurId;
-    }
 
-    public void setFournisseurId(LongFilter fournisseurId) {
-        this.fournisseurId = fournisseurId;
-    }
 
     public LongFilter getOffreId() {
         return offreId;
@@ -30,7 +24,17 @@ public class ProduitOffertCritereia  implements Serializable, Criteria {
         this.offreId = offreId;
     }
 
-    private LongFilter fournisseurId;
+
+    public LongFilter getProduitId() {
+        return produitId;
+    }
+
+    public void setProduitId(LongFilter produitId) {
+        this.produitId = produitId;
+    }
+
+    private LongFilter produitId;
+
     private LongFilter offreId;
 
     public LongFilter getPrix() {
@@ -81,7 +85,7 @@ public class ProduitOffertCritereia  implements Serializable, Criteria {
 
     public ProduitOffertCritereia(ProduitOffertCritereia other) {
         this.id = other.id == null ? null : other.id.copy();
-        this.fournisseurId = other.fournisseurId == null ? null : other.fournisseurId.copy();
+        this.produitId = other.produitId == null ? null : other.produitId.copy();
         this.offreId = other.offreId == null ? null : other.offreId.copy();
         this.nom = other.nom == null ? null : other.nom.copy();
         this.description = other.description == null ? null : other.description.copy();
@@ -119,11 +123,11 @@ public class ProduitOffertCritereia  implements Serializable, Criteria {
         }
         return offreId;
     }
-    public LongFilter fournisseurId() {
-        if (fournisseurId == null) {
-            fournisseurId = new LongFilter();
+    public LongFilter produitId() {
+        if (produitId == null) {
+            produitId = new LongFilter();
         }
-        return fournisseurId;
+        return produitId;
     }
 
 
@@ -148,7 +152,7 @@ public class ProduitOffertCritereia  implements Serializable, Criteria {
         final ProduitOffertCritereia that = (ProduitOffertCritereia) o;
         return (
                 Objects.equals(id, that.id) &&
-                        Objects.equals(fournisseurId, that.fournisseurId) &&
+                        Objects.equals(produitId, that.produitId) &&
                         Objects.equals(offreId, that.offreId) &&
                         Objects.equals(nom, that.nom) &&
                         Objects.equals(description, that.description) &&
@@ -161,7 +165,7 @@ public class ProduitOffertCritereia  implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fournisseurId,offreId, nom,description,quantite,prix, distinct);
+        return Objects.hash(id, produitId,offreId, nom,description,quantite,prix, distinct);
     }
 
     // prettier-ignore
@@ -170,7 +174,7 @@ public class ProduitOffertCritereia  implements Serializable, Criteria {
         return "ProduitOffertCritereia{" +
                 (id != null ? "id=" + id + ", " : "") +
                 (offreId != null ? "offreId=" + offreId + ", " : "") +
-                (fournisseurId != null ? "fournisseurId=" + fournisseurId + ", " : "") +
+                (produitId != null ? "fournisseurId=" + produitId + ", " : "") +
                 (distinct != null ? "distinct=" + distinct + ", " : "") +
                 "}";
     }

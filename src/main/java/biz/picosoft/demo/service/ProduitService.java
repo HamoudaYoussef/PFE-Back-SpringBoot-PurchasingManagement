@@ -1,12 +1,8 @@
 package biz.picosoft.demo.service;
 
-import biz.picosoft.demo.domain.Fournisseur;
 import biz.picosoft.demo.domain.Produit;
 import biz.picosoft.demo.errors.ResourceNotFoundException;
 import biz.picosoft.demo.repository.ProduitRepository;
-import biz.picosoft.demo.service.dto.FournisseurDTO;
-import biz.picosoft.demo.service.dto.ProduitDTO;
-import biz.picosoft.demo.service.mapper.ProduitMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,10 +14,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import biz.picosoft.demo.service.dto.ProduitDTO;
+import biz.picosoft.demo.service.mapper.ProduitMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,11 +63,18 @@ public class ProduitService {
         // Vérifiez si le fournisseur existe
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Produit not found with id " + id));
+        // Mettez à jour uniquement les champs non nulls
+        if (updatedProduit.getNom() != null) {
+            produit.setNom(updatedProduit.getNom());
+        }
+        if (updatedProduit.getDescription() != null) {
+            produit.setDescription(updatedProduit.getDescription());
+        }
+        if (updatedProduit.getQuantite() != null) {
+            produit.setQuantite(updatedProduit.getQuantite());
+        }
+       
 
-        // Mettez à jour les informations du fournisseur
-        produit.setNom(updatedProduit.getNom());
-        produit.setDescription(updatedProduit.getDescription());
-        produit.setQuantite(updatedProduit.getQuantite());
 
         // Ajoutez d'autres attributs à mettre à jour ici
 
@@ -150,6 +153,9 @@ public class ProduitService {
         } catch (IOException e) {
             throw new IOException("Could not save file " + fileName, e);
         }
+    }
+    public List<Produit> getProduitsByCategorie(Long categorieId) {
+        return produitRepository.findByCategorieId(categorieId);
     }
 
   /*  public List<Produit> getProduitsByDemandeAchatId(Long demandeAchatId) {

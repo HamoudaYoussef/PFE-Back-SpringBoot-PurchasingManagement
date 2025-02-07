@@ -11,7 +11,9 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface BonCommandeRepository extends JpaRepository<BonCommande, Long>, JpaSpecificationExecutor<BonCommande> {
-    Offre findOffreById(Long bonCommandeId);
+
+  /*  @Query("SELECT b.offre FROM BonCommande b WHERE b.id = :bonCommandeId")
+    Offre findOffreByBonCommandeId(Long bonCommandeId);*/
 
     @Query("SELECT COUNT(b) FROM BonCommande b WHERE MONTH(b.dateboncommande) =?1")
     Long countByDateCreationMois(int mois);

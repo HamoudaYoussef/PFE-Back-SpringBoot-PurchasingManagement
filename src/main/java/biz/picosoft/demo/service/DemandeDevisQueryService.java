@@ -3,9 +3,13 @@ package biz.picosoft.demo.service;
 import biz.picosoft.demo.domain.*;
 import biz.picosoft.demo.repository.DemandeDevisRepository;
 import biz.picosoft.demo.service.criteria.DemandeDevisCriteria;
-import biz.picosoft.demo.service.dto.DemandeDevisDTO;
-import biz.picosoft.demo.service.mapper.DemandeDevisMapper;
+
 import java.util.List;
+
+import biz.picosoft.demo.service.dto.DemandeDevisDTO;
+import biz.picosoft.demo.service.mapper.DemandeAchatMapper;
+import biz.picosoft.demo.service.mapper.DemandeDevisMapper;
+import biz.picosoft.demo.service.mapper.FournisseurMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,7 +25,6 @@ import javax.persistence.criteria.JoinType;
  * Service for executing complex queries for {@link DemandeDevis} entities in the database.
  * The main input is a {@link DemandeDevisCriteria} which gets converted to {@link Specification},
  * in a way that all the filters must apply.
- * It returns a {@link List} of {@link DemandeDevisDTO} or a {@link Page} of {@link DemandeDevisDTO} which fulfills the criteria.
  */
 @Service
 @Transactional(readOnly = true)
@@ -32,14 +35,21 @@ public class DemandeDevisQueryService extends QueryService<DemandeDevis> {
     private final DemandeDevisRepository demandeDevisRepository;
 
     private final DemandeDevisMapper demandeDevisMapper;
+    private final FournisseurMapper fournisseurMapper;
+    private final DemandeAchatMapper demandeAchatMapper;
 
-    public DemandeDevisQueryService(DemandeDevisRepository demandeDevisRepository, DemandeDevisMapper demandeDevisMapper) {
+
+
+    public DemandeDevisQueryService(DemandeDevisRepository demandeDevisRepository,DemandeAchatMapper demandeAchatMapper,
+                                    DemandeDevisMapper demandeDevisMapper,FournisseurMapper fournisseurMapper) {
         this.demandeDevisRepository = demandeDevisRepository;
         this.demandeDevisMapper = demandeDevisMapper;
+        this.fournisseurMapper = fournisseurMapper;
+        this.demandeAchatMapper = demandeAchatMapper;
+
     }
 
     /**
-     * Return a {@link List} of {@link DemandeDevisDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching entities.
      */
@@ -60,8 +70,23 @@ public class DemandeDevisQueryService extends QueryService<DemandeDevis> {
     public Page<DemandeDevisDTO> findByCriteria(DemandeDevisCriteria criteria, Pageable page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final Specification<DemandeDevis> specification = createSpecification(criteria);
-        return demandeDevisRepository.findAll(specification, page).map(demandeDevisMapper::toDto);
-    }
+        return demandeDevisRepository.findAll(specification, page).map(demandeDevis -> {
+            demandeDevis.getFournisseur().getNom(); // Force le chargement de la relation fournisseur
+            demandeDevis.getDemandeAchat().getReference(); // Force le chargement de la relation demandeAchat
+
+            DemandeDevisDTO dto = demandeDevisMapper.toDto(demandeDevis);
+            dto.setFournisseur(fournisseurMapper.toDto(demandeDevis.getFournisseur())); // Mapper le fournisseur complet
+            dto.setDemandeAchat(demandeAchatMapper.toDto(demandeDevis.getDemandeAchat())); // Mapper la demande d'achat complète
+            return dto;
+        });    }
+   /* public Page<DemandeDevisDTO> findByCriteria(DemandeDevisCriteria criteria, Pageable pageable) {
+        Specification<DemandeDevis> specification = createSpecification(criteria);
+
+        // Ajouter des jointures pour récupérer les informations liées
+        return demandeDevisRepository
+                .findAll(specification, pageable)
+                .map(demandeDevisMapper::toDto);
+    }*/
 
     /**
      * Return the number of matching entities in the database.
@@ -93,9 +118,7 @@ public class DemandeDevisQueryService extends QueryService<DemandeDevis> {
             if (criteria.getDescription() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getDescription(), DemandeDevis_.description));
             }
-            if (criteria.getQuantite() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getQuantite(), DemandeDevis_.quantite));
-            }
+
             if (criteria.getNom() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getNom(), DemandeDevis_.nom));
             }

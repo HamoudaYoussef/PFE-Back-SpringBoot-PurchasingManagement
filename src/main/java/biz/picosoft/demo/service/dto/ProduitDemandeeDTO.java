@@ -2,57 +2,33 @@ package biz.picosoft.demo.service.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Set;
 
 /**
+ * A DTO for the {@link biz.picosoft.demo.domain.ProduitDemandee} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProduitDemandeeDTO implements Serializable {
 
     private Long id;
 
-    public Long getDemandeAchatId() {
-        return demandeAchatId;
-    }
-
-    public void setDemandeAchatId(Long demandeAchatId) {
-        this.demandeAchatId = demandeAchatId;
-    }
-
-    private Long demandeAchatId;
+    private String description;
 
     private String nom;
-    private String description;
+
     private Long quantite;
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
 
     private String img;
 
-    public Long getDemandeDevisId() {
-        return demandeDevisId;
+    private ProduitDTO produit;
+
+    private DemandeAchatDTO demandeAchat;
+
+    public Long getId() {
+        return id;
     }
 
-    public void setDemandeDevisId(Long demandeDevisId) {
-        this.demandeDevisId = demandeDevisId;
-    }
-
-    private Long demandeDevisId;
-
-
-
-    public String getNom() {
-        return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -63,6 +39,14 @@ public class ProduitDemandeeDTO implements Serializable {
         this.description = description;
     }
 
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
     public Long getQuantite() {
         return quantite;
     }
@@ -71,14 +55,29 @@ public class ProduitDemandeeDTO implements Serializable {
         this.quantite = quantite;
     }
 
-    public Long getId() {
-        return id;
+    public String getImg() {
+        return img;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setImg(String img) {
+        this.img = img;
     }
 
+    public ProduitDTO getProduit() {
+        return produit;
+    }
+
+    public void setProduit(ProduitDTO produit) {
+        this.produit = produit;
+    }
+
+    public DemandeAchatDTO getDemandeAchat() {
+        return demandeAchat;
+    }
+
+    public void setDemandeAchat(DemandeAchatDTO demandeAchat) {
+        this.demandeAchat = demandeAchat;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -106,6 +105,12 @@ public class ProduitDemandeeDTO implements Serializable {
     public String toString() {
         return "ProduitDemandeeDTO{" +
             "id=" + getId() +
+            ", description='" + getDescription() + "'" +
+            ", nom='" + getNom() + "'" +
+            ", quantite=" + getQuantite() +
+            ", img='" + getImg() + "'" +
+            ", produit=" + getProduit() +
+            ", demandeAchat=" + getDemandeAchat() +
             "}";
     }
 }

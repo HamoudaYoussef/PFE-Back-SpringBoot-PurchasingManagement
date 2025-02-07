@@ -40,12 +40,9 @@ public interface OffreRepository extends JpaRepository<Offre, Long>, JpaSpecific
     List<Offre> findRecentOffres();
     @Query("SELECT o FROM Offre o WHERE o.fournisseur.id = :fournisseurId ")
     List<Offre> findOffresByFournisseur(@Param("fournisseurId") Long fournisseurId);
-    @Query("SELECT o FROM Offre o WHERE o.demandeachat.id = :demandeachatId ")
-    List<Offre> findOffresByDemandeAchat(@Param("demandeachatId") Long demandeachatId);
-
-    @Query("DELETE FROM Offre o WHERE o.demandeachat.id = :demandeachatId")
-    void deleteByDemandeachatId(@Param("demandeachatId") Long demandeachatId);
-
+     Offre getOffreByDemandeDevis_Id(Long demandeDevisId);
     @Query("SELECT COUNT(o) FROM Offre o WHERE MONTH(o.dateoffre) =?1")
     Long countByDateCreationMois(int mois);
+
+
 }

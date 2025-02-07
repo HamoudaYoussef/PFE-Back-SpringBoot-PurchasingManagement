@@ -81,24 +81,6 @@ public class DemandeAchat implements Serializable {
     @Column(name = "end_process")
     private Boolean endProcess;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "demandeachat")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "boncommandes", "demandeachat", "fournisseur" }, allowSetters = true)
-    private Set<Offre> offres = new HashSet<>();
-
-    public Set<DemandeDevis> getDemandeDevis() {
-        return demandedevis;
-    }
-
-    public void setDemandeDevis(Set<DemandeDevis> demandeDevis) {
-        this.demandedevis = demandeDevis;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "demandeAchat")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "fournisseur", "demandeAchat" }, allowSetters = true)
-    private Set<DemandeDevis> demandedevis = new HashSet<>();
-
     public String getNom() {
         return nom;
     }
@@ -237,36 +219,6 @@ public class DemandeAchat implements Serializable {
         this.description = description;
     }
 
-    public Set<Offre> getOffres() {
-        return this.offres;
-    }
-
-    public void setOffres(Set<Offre> offres) {
-        if (this.offres != null) {
-            this.offres.forEach(i -> i.setDemandeachat(null));
-        }
-        if (offres != null) {
-            offres.forEach(i -> i.setDemandeachat(this));
-        }
-        this.offres = offres;
-    }
-
-    public DemandeAchat offres(Set<Offre> offres) {
-        this.setOffres(offres);
-        return this;
-    }
-
-    public DemandeAchat addOffre(Offre offre) {
-        this.offres.add(offre);
-        offre.setDemandeachat(this);
-        return this;
-    }
-
-    public DemandeAchat removeOffre(Offre offre) {
-        this.offres.remove(offre);
-        offre.setDemandeachat(null);
-        return this;
-    }
 
     public Boolean isExcludeFromView() {
         return excludeFromView;
@@ -295,9 +247,9 @@ public class DemandeAchat implements Serializable {
     @Override
     public String toString() {
         return "DemandeAchat{" +
-            "id=" + getId() +
-            ", datedemande='" + getDatedemande() + "'" +
-            ", description='" + getDescription() + "'" +
-            "}";
+                "id=" + getId() +
+                ", datedemande='" + getDatedemande() + "'" +
+                ", description='" + getDescription() + "'" +
+                "}";
     }
 }

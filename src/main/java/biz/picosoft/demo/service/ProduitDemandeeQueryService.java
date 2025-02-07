@@ -51,7 +51,6 @@ public class ProduitDemandeeQueryService extends QueryService<ProduitDemandee> {
     }
 
     /**
-     * Return a {@link Page} of {@link ProduitDemandeeDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
      * @param page The page, which should be returned.
      * @return the matching entities.

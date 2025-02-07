@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
 
-import javax.persistence.criteria.JoinType;
 import java.util.List;
 @Service
 @Transactional(readOnly = true)
